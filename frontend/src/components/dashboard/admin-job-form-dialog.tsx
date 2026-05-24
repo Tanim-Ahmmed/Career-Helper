@@ -1,0 +1,300 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { ModalShell } from "@/components/shared/modal-shell";
+import { Button } from "@/components/ui/button";
+import type { Job, JobStatus } from "@/types/job";
+
+const salarySchema = z
+  .object({
+    min: z.coerce.number().min(0, "Enter a valid minimum salary."),
+    max: z.coerce.number().min(0, "Enter a valid maximum salary."),
+    currency: z.string().trim().min(3).max(3),
+    period: z.enum(["hour", "month", "year"]),
+  })
+  .refine((value) => value.max >= value.min, {
+    message: "Maximum salary must be greater than or equal to minimum salary.",
+    path: ["max"],
+  });
+
+const adminJobSchema = z.object({
+  title: z.string().trim().min(3),
+  company: z.string().trim().min(2),
+  companyLogo: z.string().trim().optional(),
+  companyWebsite: z.string().trim().optional(),
+  employmentType: z.enum(["full-time", "part-time", "contract", "internship", "freelance"]),
+  workplaceType: z.enum(["remote", "hybrid", "on-site"]),
+  category: z.string().trim().min(2),
+  experienceLevel: z.string().trim().min(2),
+  location: z.string().trim().min(2),
+  shortDescription: z.string().trim().min(30).max(240),
+  description: z.string().trim().min(80),
+  applicationDeadline: z.string().min(1),
+  featured: z.boolean(),
+  status: z.enum(["draft", "published", "closed"]),
+  salary: salarySchema,
+  skillsRequired: z.string().trim().min(2),
+  responsibilities: z.string().trim().min(2),
+  requirements: z.string().trim().min(2),
+  benefits: z.string().trim().optional(),
+  tags: z.string().trim().optional(),
+});
+
+export type AdminJobFormValues = z.infer<typeof adminJobSchema>;
+
+export function AdminJobFormDialog({
+  open,
+  mode,
+  job,
+  isSubmitting,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean;
+  mode: "create" | "edit";
+  job?: Job | null;
+  isSubmitting: boolean;
+  onClose: () => void;
+  onSubmit: (values: AdminJobFormValues) => Promise<void>;
+}) {
+  const form = useForm<AdminJobFormValues>({
+    resolver: zodResolver(adminJobSchema),
+    defaultValues: getDefaultValues(),
+  });
+  const status = form.watch("status");
+  const featured = form.watch("featured");
+  const visibilityPreview = getVisibilityPreview(status, featured);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    form.reset(getDefaultValues(job));
+  }, [form, job, open]);
+
+  return (
+    <ModalShell
+      open={open}
+      onClose={onClose}
+      title={mode === "create" ? "Create job" : "Edit job"}
+      description="Manage live hiring inventory with validated fields, status control, and consistent publishing metadata."
+      size="lg"
+    >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Job title" error={form.formState.errors.title?.message}>
+            <input className={inputClassName} {...form.register("title")} />
+          </Field>
+          <Field label="Company" error={form.formState.errors.company?.message}>
+            <input className={inputClassName} {...form.register("company")} />
+          </Field>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Company logo URL">
+            <input className={inputClassName} {...form.register("companyLogo")} />
+          </Field>
+          <Field label="Company website">
+            <input className={inputClassName} {...form.register("companyWebsite")} />
+          </Field>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Field label="Employment type" error={form.formState.errors.employmentType?.message}>
+            <select className={inputClassName} {...form.register("employmentType")}>
+              <option value="full-time">Full-time</option>
+              <option value="part-time">Part-time</option>
+              <option value="contract">Contract</option>
+              <option value="internship">Internship</option>
+              <option value="freelance">Freelance</option>
+            </select>
+          </Field>
+          <Field label="Workplace type" error={form.formState.errors.workplaceType?.message}>
+            <select className={inputClassName} {...form.register("workplaceType")}>
+              <option value="remote">Remote</option>
+              <option value="hybrid">Hybrid</option>
+              <option value="on-site">On-site</option>
+            </select>
+          </Field>
+          <Field label="Status" error={form.formState.errors.status?.message}>
+            <select className={inputClassName} {...form.register("status")}>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="closed">Closed</option>
+            </select>
+          </Field>
+          <Field label="Featured">
+            <label className="flex h-12 items-center gap-3 rounded-2xl border border-border/70 bg-background/70 px-4 text-sm text-foreground">
+              <input type="checkbox" className="size-4" {...form.register("featured")} />
+              Highlight this job
+            </label>
+          </Field>
+        </div>
+
+        <div className="rounded-[1.4rem] border border-primary/15 bg-primary/5 px-4 py-3 text-sm leading-6 text-muted-foreground">
+          Public visibility rule: jobs appear on the public <span className="font-medium text-foreground">Jobs</span> page only when their status is <span className="font-medium text-foreground">Published</span>. The homepage featured jobs section only shows roles that are both <span className="font-medium text-foreground">Published</span> and <span className="font-medium text-foreground">Featured</span>.
+        </div>
+
+        <div className="rounded-[1.4rem] border border-secondary/20 bg-secondary/5 px-4 py-3 text-sm leading-6 text-muted-foreground">
+          <p className="font-medium text-foreground">Current visibility</p>
+          <p className="mt-1">{visibilityPreview.description}</p>
+          <p className="mt-2 text-xs uppercase tracking-[0.18em] text-secondary">
+            {visibilityPreview.label}
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Field label="Category" error={form.formState.errors.category?.message}>
+            <input className={inputClassName} {...form.register("category")} />
+          </Field>
+          <Field label="Experience level" error={form.formState.errors.experienceLevel?.message}>
+            <input className={inputClassName} {...form.register("experienceLevel")} />
+          </Field>
+          <Field label="Location" error={form.formState.errors.location?.message}>
+            <input className={inputClassName} {...form.register("location")} />
+          </Field>
+          <Field label="Deadline" error={form.formState.errors.applicationDeadline?.message}>
+            <input className={inputClassName} type="date" {...form.register("applicationDeadline")} />
+          </Field>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-4">
+          <Field label="Salary min" error={form.formState.errors.salary?.min?.message}>
+            <input className={inputClassName} type="number" min="0" {...form.register("salary.min")} />
+          </Field>
+          <Field label="Salary max" error={form.formState.errors.salary?.max?.message}>
+            <input className={inputClassName} type="number" min="0" {...form.register("salary.max")} />
+          </Field>
+          <Field label="Currency" error={form.formState.errors.salary?.currency?.message}>
+            <input className={inputClassName} maxLength={3} {...form.register("salary.currency")} />
+          </Field>
+          <Field label="Salary period" error={form.formState.errors.salary?.period?.message}>
+            <select className={inputClassName} {...form.register("salary.period")}>
+              <option value="hour">Hour</option>
+              <option value="month">Month</option>
+              <option value="year">Year</option>
+            </select>
+          </Field>
+        </div>
+
+        <Field label="Short description" error={form.formState.errors.shortDescription?.message}>
+          <textarea className={`${inputClassName} min-h-24 py-3`} {...form.register("shortDescription")} />
+        </Field>
+        <Field label="Full description" error={form.formState.errors.description?.message}>
+          <textarea className={`${inputClassName} min-h-32 py-3`} {...form.register("description")} />
+        </Field>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Skills required" hint="One item per line." error={form.formState.errors.skillsRequired?.message}>
+            <textarea className={`${inputClassName} min-h-32 py-3`} {...form.register("skillsRequired")} />
+          </Field>
+          <Field label="Responsibilities" hint="One item per line." error={form.formState.errors.responsibilities?.message}>
+            <textarea className={`${inputClassName} min-h-32 py-3`} {...form.register("responsibilities")} />
+          </Field>
+          <Field label="Requirements" hint="One item per line." error={form.formState.errors.requirements?.message}>
+            <textarea className={`${inputClassName} min-h-32 py-3`} {...form.register("requirements")} />
+          </Field>
+          <Field label="Benefits" hint="One item per line.">
+            <textarea className={`${inputClassName} min-h-32 py-3`} {...form.register("benefits")} />
+          </Field>
+        </div>
+
+        <Field label="Tags" hint="Comma-separated keywords.">
+          <input className={inputClassName} {...form.register("tags")} />
+        </Field>
+
+        <div className="flex flex-col-reverse gap-3 border-t border-border/60 pt-4 sm:flex-row sm:justify-end">
+          <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (mode === "create" ? "Creating..." : "Saving...") : mode === "create" ? "Create job" : "Save changes"}
+          </Button>
+        </div>
+      </form>
+    </ModalShell>
+  );
+}
+
+function getDefaultValues(job?: Job | null): AdminJobFormValues {
+  return {
+    title: job?.title ?? "",
+    company: job?.company ?? "",
+    companyLogo: job?.companyLogo ?? "",
+    companyWebsite: job?.companyWebsite ?? "",
+    employmentType: job?.employmentType ?? "full-time",
+    workplaceType: job?.workplaceType ?? "remote",
+    category: job?.category ?? "",
+    experienceLevel: job?.experienceLevel ?? "",
+    location: job?.location ?? "",
+    shortDescription: job?.shortDescription ?? "",
+    description: job?.description ?? "",
+    applicationDeadline: job?.applicationDeadline ? job.applicationDeadline.slice(0, 10) : "",
+    featured: job?.featured ?? false,
+    status: job?.status ?? ("published" satisfies JobStatus),
+    salary: {
+      min: job?.salary.min ?? 0,
+      max: job?.salary.max ?? 0,
+      currency: job?.salary.currency ?? "USD",
+      period: job?.salary.period ?? "year",
+    },
+    skillsRequired: job?.skillsRequired.join("\n") ?? "",
+    responsibilities: job?.responsibilities.join("\n") ?? "",
+    requirements: job?.requirements.join("\n") ?? "",
+    benefits: job?.benefits.join("\n") ?? "",
+    tags: job?.tags.join(", ") ?? "",
+  };
+}
+
+function Field({
+  label,
+  error,
+  hint,
+  children,
+}: {
+  label: string;
+  error?: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="grid gap-2 text-sm text-foreground">
+      <span className="font-medium">{label}</span>
+      {children}
+      {error ? <span className="text-xs text-rose-500">{error}</span> : null}
+      {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
+    </label>
+  );
+}
+
+const inputClassName =
+  "h-12 rounded-2xl border border-border/70 bg-background/70 px-4 text-sm text-foreground outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/20";
+
+function getVisibilityPreview(status: JobStatus, featured: boolean) {
+  if (status !== "published") {
+    return {
+      label: "Admin only",
+      description:
+        "This role stays in the admin dashboard only. It will not appear on the public jobs page or the homepage featured jobs section.",
+    };
+  }
+
+  if (featured) {
+    return {
+      label: "Jobs page + homepage",
+      description:
+        "This role will appear on the public jobs page and in the homepage featured jobs section.",
+    };
+  }
+
+  return {
+    label: "Jobs page only",
+    description:
+      "This role will appear on the public jobs page, but not in the homepage featured jobs section unless you enable Featured.",
+  };
+}

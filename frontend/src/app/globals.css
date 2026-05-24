@@ -1,0 +1,122 @@
+@import "../styles/theme.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 222 47% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 239 84% 67%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 188 91% 42%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 160 84% 39%;
+  --accent-foreground: 210 40% 98%;
+  --muted: 220 20% 94%;
+  --muted-foreground: 222 16% 40%;
+  --border: 220 20% 88%;
+  --input: 220 20% 88%;
+  --ring: 239 84% 67%;
+  color-scheme: light;
+}
+
+.dark {
+  --background: 222 47% 7%;
+  --foreground: 210 40% 96%;
+  --card: 222 47% 10%;
+  --card-foreground: 210 40% 96%;
+  --popover: 222 47% 10%;
+  --popover-foreground: 210 40% 96%;
+  --primary: 239 84% 67%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 188 91% 42%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 160 84% 39%;
+  --accent-foreground: 210 40% 98%;
+  --muted: 223 28% 15%;
+  --muted-foreground: 215 20% 72%;
+  --border: 223 22% 18%;
+  --input: 223 22% 18%;
+  --ring: 188 91% 42%;
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(99, 102, 241, 0.12), transparent 32%),
+    linear-gradient(180deg, hsl(var(--background)), hsl(var(--background)));
+  color: hsl(var(--foreground));
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+*,
+::before,
+::after {
+  border-color: hsl(var(--border));
+}
+
+::selection {
+  background: rgba(99, 102, 241, 0.2);
+  color: hsl(var(--foreground));
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+}
+
+@layer utilities {
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    background-position: center;
+    background-size: 48px 48px;
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(22px);
+  }
+
+  .dark .glass-panel {
+    background: rgba(15, 23, 42, 0.68);
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+}
