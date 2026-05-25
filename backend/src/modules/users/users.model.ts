@@ -15,6 +15,90 @@ const socialLinksSchema = new Schema(
   },
 );
 
+const recruiterProfileSchema = new Schema(
+  {
+    companyName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    companyLogo: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    companyWebsite: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    companyLocation: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    companySize: {
+      type: String,
+      enum: [
+        "1-10",
+        "11-50",
+        "51-200",
+        "201-500",
+        "500+",
+      ],
+      default: "1-10",
+    },
+
+    industry: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    designation: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    companyDescription: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    foundedYear: {
+      type: Number,
+      default: null,
+    },
+
+    phone: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    hiringStatus: {
+      type: String,
+      enum: ["actively_hiring", "occasionally_hiring", "not_hiring"],
+      default: "actively_hiring",
+    },
+  },
+  {
+    _id: false,
+    versionKey: false,
+  },
+);
+
 const usersSchema = new Schema<IUser>(
   {
     name: {
@@ -78,6 +162,10 @@ const usersSchema = new Schema<IUser>(
       type: String,
       enum: ["admin", "user", "recruiter"],
       default: "user",
+    },
+    recruiterProfile: {
+      type: recruiterProfileSchema,
+      default: () => ({}),
     },
     savedJobs: {
       type: [Schema.Types.ObjectId],
