@@ -15,6 +15,57 @@ const socialLinksSchema = new Schema(
   },
 );
 
+const userProfileSchema = new Schema(
+  {
+    bio: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    profession: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    skills: {
+      type: [String],
+      default: [],
+    },
+    experienceLevel: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    resumeUrl: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    socialLinks: {
+      type: socialLinksSchema,
+      default: () => ({}),
+    },
+    savedJobs: {
+      type: [Schema.Types.ObjectId],
+      ref: "Job",
+      default: [],
+    },
+    appliedJobs: {
+      type: [Schema.Types.ObjectId],
+      ref: "Job",
+      default: [],
+    },
+    isComplete: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    _id: false,
+    versionKey: false,
+  },
+);
+
 const recruiterProfileSchema = new Schema(
   {
     companyName: {
@@ -92,6 +143,11 @@ const recruiterProfileSchema = new Schema(
       enum: ["actively_hiring", "occasionally_hiring", "not_hiring"],
       default: "actively_hiring",
     },
+
+    isComplete: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     _id: false,
@@ -130,57 +186,31 @@ const usersSchema = new Schema<IUser>(
       trim: true,
       default: "",
     },
-    bio: {
-      type: String,
-      trim: true,
-      default: "",
-    },
-    profession: {
-      type: String,
-      trim: true,
-      default: "",
-    },
-    skills: {
-      type: [String],
-      default: [],
-    },
-    experienceLevel: {
-      type: String,
-      trim: true,
-      default: "",
-    },
-    resumeUrl: {
-      type: String,
-      trim: true,
-      default: "",
-    },
-    socialLinks: {
-      type: socialLinksSchema,
-      default: () => ({}),
-    },
+    
     role: {
       type: String,
       enum: ["admin", "user", "recruiter"],
       default: "user",
     },
+
+    userProfile: {
+      type: userProfileSchema,
+      default: () => ({}),
+    },
+
     recruiterProfile: {
       type: recruiterProfileSchema,
       default: () => ({}),
     },
-    savedJobs: {
-      type: [Schema.Types.ObjectId],
-      ref: "Job",
-      default: [],
-    },
-    appliedJobs: {
-      type: [Schema.Types.ObjectId],
-      ref: "Job",
-      default: [],
-    },
+    
     aiUsageCount: {
       type: Number,
       default: 0,
       min: 0,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {

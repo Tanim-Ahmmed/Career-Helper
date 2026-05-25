@@ -12,15 +12,17 @@ function serializeUser(user: IUserDocument) {
     username: user.username,
     email: user.email,
     avatar: user.avatar,
-    bio: user.bio,
-    profession: user.profession,
-    skills: user.skills,
-    experienceLevel: user.experienceLevel,
-    resumeUrl: user.resumeUrl,
-    socialLinks: user.socialLinks,
+    userProfile: {
+      bio: user.userProfile?.bio,
+      profession: user.userProfile?.profession,
+      skills: user.userProfile?.skills,
+      experienceLevel: user.userProfile?.experienceLevel,
+      resumeUrl: user.userProfile?.resumeUrl,
+      socialLinks: user.userProfile?.socialLinks,
+      savedJobs: user.userProfile?.savedJobs.map((jobId) => jobId.toString()),
+      appliedJobs: user.userProfile?.appliedJobs.map((jobId) => jobId.toString()),
+    },
     role: user.role,
-    savedJobs: user.savedJobs.map((jobId) => jobId.toString()),
-    appliedJobs: user.appliedJobs.map((jobId) => jobId.toString()),
     aiUsageCount: user.aiUsageCount,
     createdAt: user.createdAt?.toISOString(),
     updatedAt: user.updatedAt?.toISOString(),
@@ -30,12 +32,12 @@ function serializeUser(user: IUserDocument) {
 function calculateProfileCompletion(user: IUserDocument) {
   const checkpoints = [
     user.avatar,
-    user.bio,
-    user.profession,
-    user.experienceLevel,
-    user.resumeUrl,
-    user.skills.length > 0 ? "skills" : "",
-    Object.values(user.socialLinks ?? {}).some(Boolean) ? "social" : "",
+    user.userProfile?.bio,
+    user.userProfile?.profession,
+    user.userProfile?.experienceLevel,
+    user.userProfile?.resumeUrl,
+    user.userProfile?.skills ? "skills" : "",
+    Object.values(user.userProfile?.socialLinks ?? {}).some(Boolean) ? "social" : "",
   ];
 
   const completedCount = checkpoints.filter(Boolean).length;
@@ -84,14 +86,14 @@ async function getUserDashboard(user: IUserDocument) {
       .limit(5),
     jobsModel
       .find({
-        _id: { $in: user.savedJobs },
+        _id: { $in: user?.userProfile?.savedJobs },
       })
       .sort({ updatedAt: -1 })
       .limit(4),
     jobsModel
       .find({
         status: "published",
-        $or: [{ featured: true }, { category: { $in: user.skills.slice(0, 3) } }],
+        $or: [{ featured: true }, { category: { $in: user?.userProfile?.skills.slice(0, 3) } }],
       })
       .sort({ featured: -1, createdAt: -1 })
       .limit(4),
@@ -99,8 +101,8 @@ async function getUserDashboard(user: IUserDocument) {
 
   return {
     stats: {
-      savedJobs: user.savedJobs.length,
-      appliedJobs: user.appliedJobs.length,
+      savedJobs: user?.userProfile?.savedJobs.length,
+      appliedJobs: user?.userProfile?.appliedJobs.length,
       aiUsageCount: user.aiUsageCount,
       profileCompletion: calculateProfileCompletion(user),
     },

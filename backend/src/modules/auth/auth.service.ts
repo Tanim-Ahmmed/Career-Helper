@@ -20,11 +20,10 @@ function serializeUser(user: SafeUserDocument) {
     username: user.username,
     email: user.email,
     avatar: user.avatar,
-    profession: user.profession,
     role: user.role,
     aiUsageCount: user.aiUsageCount,
-    savedJobs: user.savedJobs.map((jobId) => jobId.toString()),
-    appliedJobs: user.appliedJobs.map((jobId) => jobId.toString()),
+    savedJobs: user.userProfile?.savedJobs.map((jobId) => jobId.toString()),
+    appliedJobs: user.userProfile?.appliedJobs.map((jobId) => jobId.toString()),
   };
 }
 
@@ -97,6 +96,48 @@ async function login(payload: LoginPayload) {
   return buildAuthResponse(safeUser);
 }
 
+async function googleLogin(payload: {
+  email: string;
+  name: string;
+  avatar?: string;
+}) {
+  const email = payload.email.toLowerCase();
+
+  let user = await usersModel.findOne({ email });
+
+  if (!user) {
+    const baseUsername = email.split("@")[0];
+
+    const existingUsername = await usersModel.findOne({
+      username: baseUsername,
+    });
+
+    const username = existingUsername
+      ? `${baseUsername}_${Date.now()}`
+      : baseUsername;
+
+    user = await usersModel.create({
+      name: payload.name,
+      email,
+      avatar: payload.avatar ?? "",
+      username,
+      password: crypto.randomUUID(),
+      provider: "google",
+      role: "user",
+      skills: [],
+      socialLinks: {},
+    });
+  }
+
+  const safeUser = await usersModel.findById(user._id).select("-password");
+
+  if (!safeUser) {
+    throw new AppError("Failed to load Google user.", 500);
+  }
+
+  return buildAuthResponse(safeUser);
+}
+
 function logout() {
   return {
     success: true,
@@ -105,6 +146,11 @@ function logout() {
 }
 
 function getCurrentUser(user: SafeUserDocument) {
+  return serializeUser(user);
+}
+
+async function updateCurrentUser(user: SafeUserDocument, data:SafeUserDocument) {
+  await usersModel.findByIdAndUpdate(user.id, data,{new:true})
   return serializeUser(user);
 }
 
@@ -119,7 +165,9 @@ function getStatus() {
 export const authService = {
   register,
   login,
+  googleLogin,
   logout,
   getCurrentUser,
+  updateCurrentUser,
   getStatus,
 };

@@ -10,6 +10,8 @@ export const authRoutes = Router();
 authRoutes.get("/status", authController.getStatus);
 authRoutes.post("/register", validateRequest(registerSchema), authController.register);
 authRoutes.post("/login", validateRequest(loginSchema), authController.login);
+authRoutes.post("/google", authController.googleLogin);
 authRoutes.post("/logout", protect, authController.logout);
 authRoutes.get("/me", protect, authController.getCurrentUser);
+authRoutes.patch("/me", protect, authController.updateCurrentUser);
 authRoutes.get("/admin-status", protect, restrictTo("admin"), authController.getAdminStatus);

@@ -7,10 +7,13 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/cards/glass-card";
 import { getErrorMessage } from "@/lib/api-error";
-import { login, register } from "@/services/auth";
+import { login, register, googleLogin } from "@/services/auth";
 import { useAuthStore } from "@/store/auth-store";
 
 const loginSchema = z.object({
@@ -30,20 +33,15 @@ const registerSchema = loginSchema.extend({
     .trim()
     .min(3, "Username must be at least 3 characters.")
     .regex(/^[a-zA-Z0-9._-]+$/, "Use letters, numbers, dots, underscores, or dashes."),
-  profession: z.string().trim().optional(),
-  experienceLevel: z.string().trim().optional(),
-  skills: z.string().trim().optional(),
 });
 
 type AuthMode = "login" | "register";
+
 type AuthFormValues = {
   email: string;
   password: string;
   name: string;
   username: string;
-  profession: string;
-  experienceLevel: string;
-  skills: string;
 };
 
 export function AuthForm({ mode }: { mode: AuthMode }) {
@@ -51,52 +49,73 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const setSession = useAuthStore((state) => state.setSession);
 
   const schema = mode === "login" ? loginSchema : registerSchema;
+
   const form = useForm<AuthFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: "",
       username: "",
       email: "",
-      password: "",
-      profession: "",
-      experienceLevel: "",
-      skills: "",
+      password: ""
     },
   });
+
+  const handleGoogleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+
+      const result = await signInWithPopup(auth, provider);
+
+      const user = result.user;
+
+      const response = await googleLogin({
+        name: user.displayName!,
+        email: user.email!,
+        username: user.email!.split("@")[0]
+      });
+
+      setSession(response);
+
+      toast.success("Google login successful");
+
+      router.push("/dashboard");
+    } catch (error) {
+      console.error(error);
+      toast.error("Google login failed");
+    }
+  };
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
       const response =
         mode === "login"
           ? await login({
-              email: values.email,
-              password: values.password,
-            })
+            email: values.email,
+            password: values.password,
+          })
           : await register({
-              name: values.name,
-              username: values.username,
-              email: values.email,
-              password: values.password,
-              profession: values.profession,
-              experienceLevel: values.experienceLevel,
-              skills: values.skills
-                .split(",")
-                .map((skill: string) => skill.trim())
-                .filter(Boolean),
-            });
+            name: values.name,
+            username: values.username,
+            email: values.email,
+            password: values.password,
+          });
 
       setSession(response);
+
       toast.success(
-        mode === "login" ? "Login successful. Redirecting to your workspace." : "Account created successfully.",
+        mode === "login"
+          ? "Login successful. Redirecting..."
+          : "Account created successfully."
       );
+
       router.push(response.user.role === "admin" ? "/admin" : "/dashboard");
       router.refresh();
     } catch (error) {
       toast.error(
         getErrorMessage(
           error,
-          "Unable to complete authentication. Please verify your details and try again.",
-        ),
+          "Unable to complete authentication. Please try again."
+        )
       );
     }
   });
@@ -107,78 +126,72 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">
           {mode === "login" ? "Welcome back" : "Create account"}
         </p>
+
         <h1 className="text-3xl font-semibold tracking-tight text-foreground">
           {mode === "login"
             ? "Access your career workspace."
-            : "Start your AI-powered career growth system."}
+            : "Start your AI-powered career system."}
         </h1>
-        <p className="max-w-xl text-sm leading-6 text-muted-foreground">
+
+        <p className="text-sm text-muted-foreground">
           {mode === "login"
-            ? "Sign in to reach your dashboard, saved jobs, applications, and AI tools."
-            : "Register a professional profile so you can manage applications, track progress, and unlock upcoming AI workflows."}
+            ? "Sign in to continue."
+            : "Create your professional profile."}
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="mt-8 grid gap-4">
-        {mode === "register" ? (
+      {/* 🔵 Google Login Button */}
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full mt-6"
+        onClick={handleGoogleLogin}
+      >
+        Continue with Google
+      </Button>
+
+      <div className="my-6 flex items-center gap-3">
+        <div className="h-px flex-1 bg-border" />
+        <span className="text-xs text-muted-foreground">OR</span>
+        <div className="h-px flex-1 bg-border" />
+      </div>
+
+      <form onSubmit={onSubmit} className="grid gap-4">
+        {mode === "register" && (
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="Full name" error={form.formState.errors.name?.message}>
               <input className={inputClassName} {...form.register("name")} />
             </Field>
+
             <Field label="Username" error={form.formState.errors.username?.message}>
               <input className={inputClassName} {...form.register("username")} />
             </Field>
           </div>
-        ) : null}
+        )}
 
         <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Email address" error={form.formState.errors.email?.message}>
+          <Field label="Email" error={form.formState.errors.email?.message}>
             <input className={inputClassName} type="email" {...form.register("email")} />
           </Field>
+
           <Field label="Password" error={form.formState.errors.password?.message}>
             <input className={inputClassName} type="password" {...form.register("password")} />
           </Field>
         </div>
 
-        {mode === "register" ? (
-          <>
-            <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Profession">
-                <input className={inputClassName} {...form.register("profession")} />
-              </Field>
-              <Field label="Experience level">
-                <input className={inputClassName} {...form.register("experienceLevel")} />
-              </Field>
-            </div>
-            <Field
-              label="Skills"
-              hint="Comma-separated, for example: React, TypeScript, Product Design"
-            >
-              <input className={inputClassName} {...form.register("skills")} />
-            </Field>
-          </>
-        ) : null}
+        <Button type="submit" size="lg" disabled={form.formState.isSubmitting}>
+          {mode === "login" ? "Sign In" : "Create Account"}
+        </Button>
 
-        <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-          <Button type="submit" size="lg" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting
-              ? mode === "login"
-                ? "Signing in..."
-                : "Creating account..."
-              : mode === "login"
-                ? "Sign In"
-                : "Create Account"}
-          </Button>
-          <p className="text-sm text-muted-foreground">
-            {mode === "login" ? "Need an account?" : "Already have an account?"}{" "}
-            <Link
-              href={mode === "login" ? "/register" : "/login"}
-              className="font-semibold text-primary"
-            >
-              {mode === "login" ? "Register" : "Login"}
-            </Link>
-          </p>
-        </div>
+        <p className="text-sm text-muted-foreground">
+          {mode === "login" ? "Need account?" : "Already have account?"}{" "}
+          <Link
+            href={mode === "login" ? "/register" : "/login"}
+            className="font-semibold text-primary"
+          >
+            {mode === "login" ? "Register" : "Login"}
+          </Link>
+        </p>
       </form>
     </GlassCard>
   );
@@ -189,21 +202,16 @@ function Field({
   error,
   hint,
   children,
-}: {
-  label: string;
-  error?: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
+}: any) {
   return (
-    <label className="grid gap-2 text-sm text-foreground">
+    <label className="grid gap-2 text-sm">
       <span className="font-medium">{label}</span>
       {children}
-      {error ? <span className="text-xs text-rose-500">{error}</span> : null}
-      {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
+      {error && <span className="text-xs text-red-500">{error}</span>}
+      {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
     </label>
   );
 }
 
 const inputClassName =
-  "h-12 rounded-2xl border border-border/70 bg-background/70 px-4 text-sm text-foreground outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/20";
+  "h-12 rounded-2xl border bg-background/70 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20";

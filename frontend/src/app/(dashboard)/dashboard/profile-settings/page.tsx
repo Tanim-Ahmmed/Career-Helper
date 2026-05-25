@@ -18,16 +18,20 @@ import type { AuthUser } from "@/types/auth";
 type ProfileFormValues = {
   name: string;
   username: string;
-  profession: string;
-  experienceLevel: string;
-  bio: string;
   avatar: string;
-  resumeUrl: string;
-  skills: string;
-  linkedin: string;
-  github: string;
-  portfolio: string;
-  website: string;
+  userProfile: {
+    profession: string;
+    experienceLevel: string;
+    bio: string;
+    skills: string;
+    resumeUrl: string;
+    socialLinks: {
+      linkedin: string;
+      github: string;
+      portfolio: string;
+      website: string;
+    }
+  }
 };
 
 export default function ProfileSettingsPage() {
@@ -43,21 +47,26 @@ export default function ProfileSettingsPage() {
     defaultValues: {
       name: "",
       username: "",
-      profession: "",
-      experienceLevel: "",
-      bio: "",
       avatar: "",
-      resumeUrl: "",
-      skills: "",
-      linkedin: "",
-      github: "",
-      portfolio: "",
-      website: "",
+      userProfile: {
+        profession: "",
+        experienceLevel: "",
+        bio: "",
+        resumeUrl: "",
+        skills: "",
+        socialLinks: {
+          linkedin: "",
+          github: "",
+          portfolio: "",
+          website: "",
+        }
+      }
     },
   });
 
   useEffect(() => {
     const profile = dashboardQuery.data?.profile;
+    console.log(profile);
 
     if (!profile) {
       return;
@@ -66,16 +75,20 @@ export default function ProfileSettingsPage() {
     form.reset({
       name: profile.name ?? "",
       username: profile.username ?? "",
-      profession: profile.profession ?? "",
-      experienceLevel: profile.experienceLevel ?? "",
-      bio: profile.bio ?? "",
       avatar: profile.avatar ?? "",
-      resumeUrl: profile.resumeUrl ?? "",
-      skills: profile.skills?.join(", ") ?? "",
-      linkedin: profile.socialLinks?.linkedin ?? "",
-      github: profile.socialLinks?.github ?? "",
-      portfolio: profile.socialLinks?.portfolio ?? "",
-      website: profile.socialLinks?.website ?? "",
+      userProfile: {
+        profession: profile.userProfile?.profession ?? "",
+        experienceLevel: profile.userProfile?.experienceLevel ?? "",
+        bio: profile.userProfile?.bio ?? "",
+        resumeUrl: profile.userProfile?.resumeUrl ?? "",
+        skills: profile.userProfile?.skills?.join(", ") ?? "",
+        socialLinks: {
+          linkedin: profile.userProfile?.socialLinks?.linkedin ?? "",
+          github: profile.userProfile?.socialLinks?.github ?? "",
+          portfolio: profile.userProfile?.socialLinks?.portfolio ?? "",
+          website: profile.userProfile?.socialLinks?.website ?? "",
+        }
+      }
     });
   }, [dashboardQuery.data?.profile, form]);
 
@@ -85,25 +98,14 @@ export default function ProfileSettingsPage() {
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      const updatedProfile = await updateProfile({
-        name: values.name,
-        username: values.username,
-        profession: values.profession,
-        experienceLevel: values.experienceLevel,
-        bio: values.bio,
-        avatar: values.avatar,
-        resumeUrl: values.resumeUrl,
-        skills: values.skills
-          .split(",")
-          .map((skill) => skill.trim())
-          .filter(Boolean),
-        socialLinks: {
-          linkedin: values.linkedin,
-          github: values.github,
-          portfolio: values.portfolio,
-          website: values.website,
+      const payload = {
+        ...values,
+        userProfile: {
+          ...values.userProfile,
+          skills: values.userProfile.skills.split(",").map((skill: string) => skill.trim()).filter(Boolean),
         },
-      } as Partial<AuthUser>);
+      };
+      const updatedProfile = await updateProfile(payload as Partial<AuthUser>);
 
       updateUser(updatedProfile);
       await queryClient.invalidateQueries({ queryKey: ["user-dashboard"] });
@@ -132,39 +134,39 @@ export default function ProfileSettingsPage() {
             </Field>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Profession">
-              <input className={inputClassName} {...form.register("profession")} />
-            </Field>
-            <Field label="Experience level">
-              <input className={inputClassName} {...form.register("experienceLevel")} />
-            </Field>
-          </div>
-          <Field label="Bio">
-            <textarea className={`${inputClassName} min-h-32 py-3`} {...form.register("bio")} />
-          </Field>
-          <div className="grid gap-4 md:grid-cols-2">
             <Field label="Avatar URL">
               <input className={inputClassName} {...form.register("avatar")} />
             </Field>
             <Field label="Resume URL">
-              <input className={inputClassName} {...form.register("resumeUrl")} />
+              <input className={inputClassName} {...form.register("userProfile.resumeUrl")} />
             </Field>
           </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Profession">
+              <input className={inputClassName} {...form.register("userProfile.profession")} />
+            </Field>
+            <Field label="Experience level">
+              <input className={inputClassName} {...form.register("userProfile.experienceLevel")} />
+            </Field>
+          </div>
+          <Field label="Bio">
+            <textarea className={`${inputClassName} min-h-32 py-3`} {...form.register("userProfile.bio")} />
+          </Field>
           <Field label="Skills">
-            <input className={inputClassName} {...form.register("skills")} />
+            <input className={inputClassName} {...form.register("userProfile.skills")} />
           </Field>
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="LinkedIn">
-              <input className={inputClassName} {...form.register("linkedin")} />
+              <input className={inputClassName} {...form.register("userProfile.socialLinks.linkedin")} />
             </Field>
             <Field label="GitHub">
-              <input className={inputClassName} {...form.register("github")} />
+              <input className={inputClassName} {...form.register("userProfile.socialLinks.github")} />
             </Field>
             <Field label="Portfolio">
-              <input className={inputClassName} {...form.register("portfolio")} />
+              <input className={inputClassName} {...form.register("userProfile.socialLinks.portfolio")} />
             </Field>
             <Field label="Website">
-              <input className={inputClassName} {...form.register("website")} />
+              <input className={inputClassName} {...form.register("userProfile.socialLinks.website")} />
             </Field>
           </div>
           <div className="flex justify-end">

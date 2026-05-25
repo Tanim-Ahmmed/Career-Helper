@@ -26,7 +26,7 @@ export const optionalProtect = catchAsync(
   },
 );
 
-export function restrictTo(...roles: Array<"admin" | "user">) {
+export function restrictTo(...roles: Array<"admin" | "user" | 'recruiter'>) {
   return (req: Request, _res: Response, next: NextFunction) => {
     if (!req.user) {
       return next(new AppError("Authentication required.", 401));

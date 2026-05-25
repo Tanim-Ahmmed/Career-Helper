@@ -78,7 +78,7 @@ export function JobDetailsPage({ slug }: { slug: string }) {
 
   const applicationForm = useForm({
     defaultValues: {
-      resumeUrl: user?.resumeUrl ?? "",
+      resumeUrl: user?.userProfile?.resumeUrl ?? "",
       coverLetter: "",
     },
   });
@@ -92,7 +92,10 @@ export function JobDetailsPage({ slug }: { slug: string }) {
 
         updateUser({
           ...user,
-          appliedJobs: Array.from(new Set([...(user.appliedJobs ?? []), appliedJobId ?? ""])).filter(Boolean),
+          userProfile:{
+            ...user.userProfile,
+            appliedJobs: Array.from(new Set([...(user?.userProfile?.appliedJobs ?? []), appliedJobId ?? ""])).filter(Boolean),
+          }
         });
       }
 
@@ -106,7 +109,7 @@ export function JobDetailsPage({ slug }: { slug: string }) {
       toast.success("Application submitted successfully.");
       setIsApplyModalOpen(false);
       applicationForm.reset({
-        resumeUrl: user?.resumeUrl ?? "",
+        resumeUrl: user?.userProfile?.resumeUrl ?? "",
         coverLetter: "",
       });
     },
@@ -180,8 +183,8 @@ export function JobDetailsPage({ slug }: { slug: string }) {
   }
 
   const { job, relatedJobs } = data;
-  const isSaved = Boolean(user?.savedJobs?.includes(job._id));
-  const hasApplied = Boolean(user?.appliedJobs?.includes(job._id));
+  const isSaved = Boolean(user?.userProfile?.savedJobs?.includes(job._id));
+  const hasApplied = Boolean(user?.userProfile?.appliedJobs?.includes(job._id));
 
   return (
     <main className="min-h-screen overflow-x-hidden pb-16 pt-32 sm:pt-36">

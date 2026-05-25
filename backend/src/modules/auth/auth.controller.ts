@@ -24,6 +24,16 @@ const login = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const googleLogin = catchAsync(async (req: Request, res: Response) => {
+  const result = await authService.googleLogin(req.body);
+
+  sendResponse(res, 200, {
+    success: true,
+    message: "Google login successful.",
+    data: result,
+  });
+});
+
 const logout = (req: Request, res: Response) => {
   void req;
 
@@ -35,6 +45,17 @@ const getCurrentUser = (req: Request, res: Response) => {
     success: true,
     message: "Authenticated user retrieved successfully.",
     data: authService.getCurrentUser(req.user!),
+  });
+};
+
+const updateCurrentUser = (req: Request, res: Response) => {
+  const data = req.body
+  console.log(data);
+  console.log(req.user);
+  sendResponse(res, 200, {
+    success: true,
+    message: "Authenticated user retrieved successfully.",
+    data: authService.updateCurrentUser(req.user!, data),
   });
 };
 
@@ -61,8 +82,10 @@ const getStatus = (_req: Request, res: Response) => {
 export const authController = {
   register,
   login,
+  googleLogin,
   logout,
   getCurrentUser,
+  updateCurrentUser,
   getAdminStatus,
   getStatus,
 };

@@ -6,21 +6,25 @@ export interface AuthUser {
   username: string;
   email: string;
   avatar?: string;
-  bio?: string;
-  profession?: string;
-  skills?: string[];
-  experienceLevel?: string;
-  resumeUrl?: string;
-  socialLinks?: {
-    linkedin?: string;
-    github?: string;
-    portfolio?: string;
-    website?: string;
-  };
+  
+  userProfile: {
+    bio?: string;
+    profession?: string;
+    skills?: string[];
+    experienceLevel?: string;
+    resumeUrl?: string;
+    savedJobs?: string[];
+    appliedJobs?: string[];
+
+    socialLinks?: {
+      linkedin?: string;
+      github?: string;
+      portfolio?: string;
+      website?: string;
+    };
+  }
   role: UserRole;
   aiUsageCount: number;
-  savedJobs?: string[];
-  appliedJobs?: string[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -40,8 +44,10 @@ export interface RegisterPayload {
   username: string;
   email: string;
   password: string;
-  profession?: string;
-  experienceLevel?: string;
-  skills?: string[];
-  bio?: string;
+}
+
+export interface GooglePayload {
+  name: string;
+  username: string;
+  email: string;
 }

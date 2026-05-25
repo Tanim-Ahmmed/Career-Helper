@@ -2,6 +2,7 @@ import { api } from "@/services/api";
 import type {
   AuthResponse,
   AuthUser,
+  GooglePayload,
   LoginPayload,
   RegisterPayload,
 } from "@/types/auth";
@@ -22,6 +23,16 @@ export async function register(payload: RegisterPayload) {
     message: string;
     data: AuthResponse;
   }>("/auth/register", payload);
+
+  return data.data;
+}
+
+export async function googleLogin(payload: GooglePayload) {
+  const { data } = await api.post<{
+    success: boolean;
+    message: string;
+    data: AuthResponse;
+  }>("/auth/google", payload);
 
   return data.data;
 }

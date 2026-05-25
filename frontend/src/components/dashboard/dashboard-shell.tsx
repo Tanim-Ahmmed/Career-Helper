@@ -35,13 +35,13 @@ import { useAuthStore } from "@/store/auth-store";
 
 const userNavigation = [
   { href: "/dashboard", label: "Overview", icon: Home },
-  { href: "/dashboard/applications", label: "Applications", icon: BriefcaseBusiness },
-  { href: "/dashboard/saved-jobs", label: "Saved Jobs", icon: Sparkles },
+  { href: "/dashboard/profile-settings", label: "Profile Settings", icon: UserCircle2 },
   { href: "/dashboard/resume-analyzer", label: "Resume Analyzer", icon: FileSearch },
   { href: "/dashboard/cover-letters", label: "Cover Letters", icon: FileText },
+  { href: "/dashboard/saved-jobs", label: "Saved Jobs", icon: Sparkles },
+  { href: "/dashboard/applications", label: "Applications", icon: BriefcaseBusiness },
   { href: "/dashboard/interview-assistant", label: "Interview Assistant", icon: MessageSquareQuote },
   { href: "/dashboard/ai-history", label: "AI History", icon: BarChart3 },
-  { href: "/dashboard/profile-settings", label: "Profile Settings", icon: UserCircle2 },
 ];
 
 const adminNavigation = [
@@ -133,7 +133,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 </p>
                 <p className="break-words text-base font-semibold text-foreground">{user.name}</p>
                 <p className="text-sm text-muted-foreground">
-                  {user.profession || (user.role === "admin" ? "Platform Admin" : "Career Builder")}
+                  {user.userProfile?.profession || (user.role === "admin" ? "Platform Admin" : "Career Builder")}
                 </p>
               </div>
             </div>
