@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "user";
+export type UserRole = "admin" | "user" | "recruiter";
 
 export interface AuthUser {
   id: string;
@@ -44,12 +44,11 @@ export interface RegisterPayload {
   username: string;
   email: string;
   password: string;
-  role: string;
+  role: "user" | "recruiter";
 }
 
 export interface GooglePayload {
   name: string;
   username: string;
   email: string;
-  role: string;
 }
