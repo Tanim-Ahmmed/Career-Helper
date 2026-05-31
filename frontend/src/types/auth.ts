@@ -44,10 +44,12 @@ export interface RegisterPayload {
   username: string;
   email: string;
   password: string;
+  role: string;
 }
 
 export interface GooglePayload {
   name: string;
   username: string;
   email: string;
+  role: string;
 }
