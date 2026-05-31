@@ -86,10 +86,14 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         return;
       }
 
+      // Get role from form
+      const selectedRole = form.getValues("role") || "user";
+
       const response = await googleLogin({
         name: user.displayName,
         email: user.email,
         username: user.email.split("@")[0],
+        role: selectedRole,
       });
 
       setSession(response);
@@ -392,4 +396,4 @@ function Field({
 /* ==================== INPUT STYLING ==================== */
 
 const inputClassName =
-  "h-12 w-full rounded-2xl border border-input bg-background/70 px-4 text-sm placeholder:text-muted-foreground outline-none transition-all focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed invalid:border-red-500 invalid:focus:ring-red-500/20";
+  "h-12 w-full rounded-2xl border border-input bg-background/70 px-4 text-sm placeholder:text-muted-foreground outline-none transition-all focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed";
