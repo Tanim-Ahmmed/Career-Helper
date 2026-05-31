@@ -78,6 +78,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         name: user.displayName || "User",
         email: user.email!,
         username: user.email!.split("@")[0],
+        role: form.role,
       });
 
       setSession(response);
