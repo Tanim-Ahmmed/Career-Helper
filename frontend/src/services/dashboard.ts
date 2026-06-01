@@ -15,7 +15,6 @@ export async function fetchUserDashboard() {
     message: string;
     data: UserDashboardResponse;
   }>("/users/dashboard");
-
   return data.data;
 }
 
@@ -24,7 +23,7 @@ export async function updateProfile(payload: Partial<AuthUser>) {
     success: boolean;
     message: string;
     data: AuthUser;
-  }>("/users/me", payload);
+  }>("/auth/me", payload);
 
   return data.data;
 }

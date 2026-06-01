@@ -28,14 +28,8 @@ const loginSchema = z.object({
 
 const registerSchema = loginSchema.extend({
   name: z.string().trim().min(2, "Name is too short."),
-  username: z
-    .string()
-    .trim()
-    .min(3, "Username must be at least 3 characters.")
-    .regex(/^[a-zA-Z0-9._-]+$/, "Use letters, numbers, dots, underscores, or dashes."),
-  role: z.enum(["user", "recruiter"], {
-    errorMap: () => ({ message: "Please select a role." }),
-  }),
+  username: z.string().trim().min(3, "Username must be at least 3 characters.").regex(/^[a-zA-Z0-9._-]+$/, "Use letters, numbers, dots, underscores, or dashes."),
+  role: z.enum(["user", "recruiter"], { message: "Please select a role.", }),
 });
 
 /* ==================== TYPE DEFINITIONS ==================== */
@@ -68,7 +62,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       password: "",
       role: "user",
     },
-    mode: "onBlur",
+    mode: "onSubmit",
   });
 
   const isSubmitting = form.formState.isSubmitting;
@@ -103,9 +97,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       const redirectPath =
         response.user.role === "admin"
           ? "/admin"
-          : response.user.role === "recruiter"
-            ? "/recruiter"
-            : "/dashboard";
+          : "/dashboard";
 
       router.push(redirectPath);
     } catch (error) {
@@ -140,17 +132,16 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       const response =
         mode === "login"
           ? await login({
-              email: values.email,
-              password: values.password,
-            })
+            email: values.email,
+            password: values.password,
+          })
           : await register({
-              name: values.name,
-              username: values.username,
-              email: values.email,
-              password: values.password,
-              role: values.role,
-            });
-
+            name: values.name,
+            username: values.username,
+            email: values.email,
+            password: values.password,
+            role: values.role,
+          });
       setSession(response);
 
       toast.success(
@@ -163,9 +154,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       const redirectPath =
         response.user.role === "admin"
           ? "/admin"
-          : response.user.role === "recruiter"
-            ? "/recruiter"
-            : "/dashboard";
+          : "/dashboard";
 
       router.push(redirectPath);
       router.refresh();

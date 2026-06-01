@@ -48,16 +48,15 @@ const getCurrentUser = (req: Request, res: Response) => {
   });
 };
 
-const updateCurrentUser = (req: Request, res: Response) => {
-  const data = req.body
-  console.log(data);
-  console.log(req.user);
+const updateCurrentUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await authService.updateCurrentUser(req.user!, req.body);
+
   sendResponse(res, 200, {
     success: true,
-    message: "Authenticated user retrieved successfully.",
-    data: authService.updateCurrentUser(req.user!, data),
+    message: "Profile updated successfully.",
+    data: result,
   });
-};
+});
 
 const getAdminStatus = (req: Request, res: Response) => {
   sendResponse(res, 200, {

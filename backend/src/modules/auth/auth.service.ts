@@ -149,9 +149,16 @@ function getCurrentUser(user: SafeUserDocument) {
   return serializeUser(user);
 }
 
-async function updateCurrentUser(user: SafeUserDocument, data:SafeUserDocument) {
-  await usersModel.findByIdAndUpdate(user.id, data,{new:true})
-  return serializeUser(user);
+async function updateCurrentUser(user: SafeUserDocument, payload: SafeUserDocument) {
+  console.log(user, payload);
+  return await usersModel.findByIdAndUpdate(
+    user._id,
+    { $set: payload },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 }
 
 function getStatus() {

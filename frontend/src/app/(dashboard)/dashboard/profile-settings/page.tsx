@@ -46,22 +46,22 @@ type ProfileFormValues = {
     companyDescription: string;
 
     companySize:
-      | "1-10"
-      | "11-50"
-      | "51-200"
-      | "201-500"
-      | "500+"
-      | "";
+    | "1-10"
+    | "11-50"
+    | "51-200"
+    | "201-500"
+    | "500+"
+    | "";
 
     foundedYear: string;
 
     phone: string;
 
     hiringStatus:
-      | "actively_hiring"
-      | "occasionally_hiring"
-      | "not_hiring"
-      | "";
+    | "actively_hiring"
+    | "occasionally_hiring"
+    | "not_hiring"
+    | "";
   };
 };
 
@@ -104,18 +104,12 @@ export default function ProfileSettingsPage() {
         companyLogo: "",
         companyWebsite: "",
         companyLocation: "",
-
         industry: "",
         designation: "",
-
         companyDescription: "",
-
         companySize: "",
-
         foundedYear: "",
-
         phone: "",
-
         hiringStatus: "",
       },
     },
@@ -133,64 +127,30 @@ export default function ProfileSettingsPage() {
 
       userProfile: {
         profession: profile.userProfile?.profession ?? "",
-        experienceLevel:
-          profile.userProfile?.experienceLevel ?? "",
+        experienceLevel: profile.userProfile?.experienceLevel ?? "",
         bio: profile.userProfile?.bio ?? "",
         resumeUrl: profile.userProfile?.resumeUrl ?? "",
-
-        skills:
-          profile.userProfile?.skills?.join(", ") ?? "",
-
+        skills: profile.userProfile?.skills?.join(", ") ?? "",
         socialLinks: {
-          linkedin:
-            profile.userProfile?.socialLinks?.linkedin ?? "",
-
-          github:
-            profile.userProfile?.socialLinks?.github ?? "",
-
-          portfolio:
-            profile.userProfile?.socialLinks?.portfolio ?? "",
-
-          website:
-            profile.userProfile?.socialLinks?.website ?? "",
+          linkedin: profile.userProfile?.socialLinks?.linkedin ?? "",
+          github: profile.userProfile?.socialLinks?.github ?? "",
+          portfolio: profile.userProfile?.socialLinks?.portfolio ?? "",
+          website: profile.userProfile?.socialLinks?.website ?? "",
         },
       },
 
       recruiterProfile: {
-        companyName:
-          profile.recruiterProfile?.companyName ?? "",
-
-        companyLogo:
-          profile.recruiterProfile?.companyLogo ?? "",
-
-        companyWebsite:
-          profile.recruiterProfile?.companyWebsite ?? "",
-
-        companyLocation:
-          profile.recruiterProfile?.companyLocation ?? "",
-
-        industry:
-          profile.recruiterProfile?.industry ?? "",
-
-        designation:
-          profile.recruiterProfile?.designation ?? "",
-
-        companyDescription:
-          profile.recruiterProfile?.companyDescription ??
-          "",
-
-        companySize:
-          profile.recruiterProfile?.companySize ?? "",
-
-        foundedYear:
-          profile.recruiterProfile?.foundedYear?.toString() ??
-          "",
-
-        phone:
-          profile.recruiterProfile?.phone ?? "",
-
-        hiringStatus:
-          profile.recruiterProfile?.hiringStatus ?? "",
+        companyName: profile.recruiterProfile?.companyName ?? "",
+        companyLogo: profile.recruiterProfile?.companyLogo ?? "",
+        companyWebsite: profile.recruiterProfile?.companyWebsite ?? "",
+        companyLocation: profile.recruiterProfile?.companyLocation ?? "",
+        industry: profile.recruiterProfile?.industry ?? "",
+        designation: profile.recruiterProfile?.designation ?? "",
+        companyDescription: profile.recruiterProfile?.companyDescription ?? "",
+        companySize: profile.recruiterProfile?.companySize ?? "",
+        foundedYear: profile.recruiterProfile?.foundedYear?.toString() ?? "",
+        phone: profile.recruiterProfile?.phone ?? "",
+        hiringStatus: profile.recruiterProfile?.hiringStatus ?? "",
       },
     });
   }, [dashboardQuery.data?.profile, form]);

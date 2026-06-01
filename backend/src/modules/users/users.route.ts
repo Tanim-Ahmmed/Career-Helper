@@ -3,13 +3,13 @@ import { Router } from "express";
 import { protect, restrictTo } from "../../middleware/auth";
 import { validateRequest } from "../../middleware/validate-request";
 import { usersController } from "./users.controller";
-import { savedJobParamSchema, updateProfileSchema } from "./users.validation";
+import { savedJobParamSchema, updateUserProfileSchema } from "./users.validation";
 
 export const usersRoutes = Router();
 
 usersRoutes.get("/status", usersController.getStatus);
 usersRoutes.get("/me", protect, usersController.getProfile);
-usersRoutes.patch("/me", protect, validateRequest(updateProfileSchema), usersController.updateProfile);
+usersRoutes.patch("/me", protect, validateRequest(updateUserProfileSchema), usersController.updateProfile);
 usersRoutes.post(
   "/me/saved-jobs/:jobId",
   protect,

@@ -6,7 +6,7 @@ export interface AuthUser {
   username: string;
   email: string;
   avatar?: string;
-  
+
   userProfile: {
     bio?: string;
     profession?: string;
@@ -23,6 +23,7 @@ export interface AuthUser {
       website?: string;
     };
   }
+  recruiterProfile: any;
   role: UserRole;
   aiUsageCount: number;
   createdAt?: string;
@@ -51,4 +52,5 @@ export interface GooglePayload {
   name: string;
   username: string;
   email: string;
+  role: "user" | "recruiter";
 }
