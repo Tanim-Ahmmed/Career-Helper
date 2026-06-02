@@ -36,11 +36,11 @@ import { useAuthStore } from "@/store/auth-store";
 type DropdownKey = "resources" | "profile" | null;
 
 const accountMenuItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Applications", href: "/dashboard/applications", icon: BriefcaseBusiness },
-  { label: "Resume Analyzer", href: "/dashboard/resume-analyzer", icon: FileSearch },
-  { label: "Cover Letters", href: "/dashboard/cover-letters", icon: FileText },
-  { label: "Interview Assistant", href: "/dashboard/interview-assistant", icon: MessageSquareQuote },
+  { label: "Dashboard", href: "/user", icon: LayoutDashboard },
+  { label: "Applications", href: "/user/applications", icon: BriefcaseBusiness },
+  { label: "Resume Analyzer", href: "/user/resume-analyzer", icon: FileSearch },
+  { label: "Cover Letters", href: "/user/cover-letters", icon: FileText },
+  { label: "Interview Assistant", href: "/user/interview-assistant", icon: MessageSquareQuote },
 ];
 
 export function SiteNavbar() {
@@ -191,7 +191,7 @@ export function SiteNavbar() {
                       <div className="min-w-0 text-left">
                         <p className="break-words text-sm font-semibold text-foreground">{user?.name}</p>
                         <p className="truncate text-xs text-muted-foreground">
-                          {user?.profession || "Career Builder"}
+                          {user?.role === "user" ? "Career Builder" : "Manage Emplyer"}
                         </p>
                       </div>
                     </>
@@ -314,7 +314,7 @@ export function SiteNavbar() {
                         <div className="min-w-0">
                           <p className="break-words font-semibold text-foreground">{user?.name}</p>
                           <p className="truncate text-sm text-muted-foreground">
-                            {user?.profession || "Career Builder"}
+                            {user?.role === "recruiter" ? "Manage Emplyer" : "Career Builder"}
                           </p>
                         </div>
                       </div>

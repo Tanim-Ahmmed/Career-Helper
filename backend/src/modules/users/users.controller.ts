@@ -40,12 +40,22 @@ const getUserDashboard = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getAdminDashboard = catchAsync(async (_req: Request, res: Response) => {
+const getAdminDashboard = catchAsync(async (req: Request, res: Response) => {
   const result = await usersService.getAdminDashboard();
 
   sendResponse(res, 200, {
     success: true,
     message: "Admin dashboard retrieved successfully.",
+    data: result,
+  });
+});
+
+const getRecruiterDashboard = catchAsync(async (req: Request, res: Response) => {
+  const result = await usersService.getRecruiterDashboard(req.user!._id.toString());
+
+  sendResponse(res, 200, {
+    success: true,
+    message: "Recruiter dashboard retrieved successfully.",
     data: result,
   });
 });
@@ -85,6 +95,7 @@ export const usersController = {
   getProfile,
   updateProfile,
   getUserDashboard,
+  getRecruiterDashboard,
   getAdminDashboard,
   getAdminUsers,
   saveJob,

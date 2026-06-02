@@ -8,6 +8,7 @@ import { z } from "zod";
 import { ModalShell } from "@/components/shared/modal-shell";
 import { Button } from "@/components/ui/button";
 import type { Job, JobStatus } from "@/types/job";
+import { useAuthStore } from "@/store/auth-store";
 
 const salarySchema = z
   .object({
@@ -61,6 +62,7 @@ export function AdminJobFormDialog({
   onClose: () => void;
   onSubmit: (values: AdminJobFormValues) => Promise<void>;
 }) {
+  const currentUser = useAuthStore((state) => state.user);
   const form = useForm<AdminJobFormValues>({
     resolver: zodResolver(adminJobSchema),
     defaultValues: getDefaultValues(),
@@ -122,7 +124,7 @@ export function AdminJobFormDialog({
             </select>
           </Field>
           <Field label="Status" error={form.formState.errors.status?.message}>
-            <select className={inputClassName} {...form.register("status")}>
+            <select disabled={currentUser?.role !== "admin"} className={inputClassName} {...form.register("status")}>
               <option value="draft">Draft</option>
               <option value="published">Published</option>
               <option value="closed">Closed</option>
@@ -236,7 +238,7 @@ function getDefaultValues(job?: Job | null): AdminJobFormValues {
     description: job?.description ?? "",
     applicationDeadline: job?.applicationDeadline ? job.applicationDeadline.slice(0, 10) : "",
     featured: job?.featured ?? false,
-    status: job?.status ?? ("published" satisfies JobStatus),
+    status: job?.status ?? ("draft" satisfies JobStatus),
     salary: {
       min: job?.salary.min ?? 0,
       max: job?.salary.max ?? 0,

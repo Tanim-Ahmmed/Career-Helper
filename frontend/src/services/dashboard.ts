@@ -6,7 +6,7 @@ import type {
 } from "@/types/application";
 import type { AuthUser } from "@/types/auth";
 import type { PaginatedBlogsResponse } from "@/types/blog";
-import type { AdminDashboardResponse, UserDashboardResponse } from "@/types/dashboard";
+import type { AdminDashboardResponse, RecruiterDashboardResponse, UserDashboardResponse } from "@/types/dashboard";
 import type { JobsResponse } from "@/types/job";
 
 export async function fetchUserDashboard() {
@@ -38,6 +38,15 @@ export async function fetchMyApplications() {
   return data.data;
 }
 
+export async function fetchRecruiterDashboard() {
+  const { data } = await api.get<{
+    success: boolean;
+    message: string;
+    data: RecruiterDashboardResponse;
+  }>("/users/recruiter/overview");
+
+  return data.data;
+}
 export async function fetchAdminDashboard() {
   const { data } = await api.get<{
     success: boolean;

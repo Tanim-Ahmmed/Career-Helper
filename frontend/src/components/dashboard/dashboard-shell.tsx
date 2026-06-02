@@ -20,6 +20,18 @@ import {
   Sparkles,
   UserCircle2,
   Users2,
+  Bookmark,
+  FilePlus2,
+  Bell,
+  BellRing,
+  Building2,
+  PlusCircle,
+  Users,
+  Star,
+  CalendarDays,
+  CreditCard,
+  FolderTree,
+  BadgeCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -34,22 +46,61 @@ import { logout } from "@/services/auth";
 import { useAuthStore } from "@/store/auth-store";
 
 const userNavigation = [
-  { href: "/dashboard", label: "Overview", icon: Home },
-  { href: "/dashboard/profile-settings", label: "Profile Settings", icon: UserCircle2 },
-  { href: "/dashboard/resume-analyzer", label: "Resume Analyzer", icon: FileSearch },
-  { href: "/dashboard/cover-letters", label: "Cover Letters", icon: FileText },
-  { href: "/dashboard/saved-jobs", label: "Saved Jobs", icon: Sparkles },
-  { href: "/dashboard/applications", label: "Applications", icon: BriefcaseBusiness },
-  { href: "/dashboard/interview-assistant", label: "Interview Assistant", icon: MessageSquareQuote },
-  { href: "/dashboard/ai-history", label: "AI History", icon: BarChart3 },
+  { href: "/user", label: "Overview", icon: Home },
+  { href: "/user/profile-settings", label: "Profile Settings", icon: UserCircle2 },
+
+  { href: "/user/saved-jobs", label: "Saved Jobs", icon: Bookmark },
+  { href: "/user/applications", label: "My Applications", icon: FileText },
+
+  { href: "/user/resume-builder", label: "Resume Builder", icon: FilePlus2 },
+  { href: "/user/cover-letters", label: "Cover Letters", icon: FileText },
+  
+  { href: "/user/interview-assistant", label: "Interview Assistant", icon: MessageSquareQuote },
+  { href: "/user/job-alerts", label: "Job Alerts", icon: Bell },
+  
+  { href: "/user/notifications", label: "Notifications", icon: BellRing },
+  { href: "/user/ai-history", label: "AI History", icon: BarChart3 },
+];
+
+const recruiterNavigation = [
+  { href: "/recruiter", label: "Dashboard", icon: Home },
+  { href: "/recruiter/profile-settings", label: "Profile Settings", icon: Building2 },
+  { href: "/recruiter/jobs", label: "Manage Jobs", icon: BriefcaseBusiness },
+  { href: "/recruiter/applications", label: "Applications", icon: FileText },
+  
+  // { href: "/recruiter/candidates", label: "Candidates", icon: Users },
+  { href: "/recruiter/resume-analyzer", label: "Resume Analyzer", icon: FileSearch },
+
+  { href: "/recruiter/shortlisted", label: "Shortlisted", icon: Star },
+
+  { href: "/recruiter/interviews", label: "Interviews", icon: CalendarDays },
+
+  { href: "/recruiter/analytics", label: "Analytics", icon: BarChart3 },
+
+  { href: "/recruiter/subscription", label: "Subscription", icon: CreditCard },
+
+  { href: "/recruiter/settings", label: "Settings", icon: Settings },
 ];
 
 const adminNavigation = [
   { href: "/admin", label: "Analytics", icon: ShieldCheck },
-  { href: "/admin/jobs", label: "Manage Jobs", icon: BriefcaseBusiness },
-  { href: "/admin/users", label: "Manage Users", icon: Users2 },
-  { href: "/admin/blogs", label: "Manage Blogs", icon: BookOpenText },
+
+  { href: "/admin/users", label: "Users", icon: Users2 },
+  { href: "/admin/recruiters", label: "Recruiters", icon: Building2 },
+
+  { href: "/admin/jobs", label: "Jobs", icon: BriefcaseBusiness },
+  { href: "/admin/applications", label: "Applications", icon: FileText },
+
+  { href: "/admin/blogs", label: "Blogs", icon: BookOpenText },
+
+  { href: "/admin/categories", label: "Categories", icon: FolderTree },
+
+  { href: "/admin/skills", label: "Skills", icon: BadgeCheck },
+
   { href: "/admin/reports", label: "Reports", icon: BarChart3 },
+
+  { href: "/admin/payments", label: "Payments", icon: CreditCard },
+
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
@@ -73,11 +124,15 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     }
 
     if (pathname.startsWith("/admin") && user.role !== "admin") {
-      router.replace("/dashboard");
+      router.replace("/");
     }
 
-    if (pathname.startsWith("/dashboard") && user.role === "admin") {
-      router.replace("/admin");
+    if (pathname.startsWith("/recruiter") && user.role !== "recruiter") {
+      router.replace("/");
+    }
+
+    if (pathname.startsWith("/user") && user.role !== "user") {
+      router.replace("/");
     }
   }, [hydrated, pathname, router, user]);
 
@@ -116,7 +171,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const navigation = user.role === "admin" ? adminNavigation : userNavigation;
+  const navigation = user.role === "admin" ? adminNavigation : user.role === "user" ? userNavigation : recruiterNavigation;
 
   return (
     <main className="min-h-screen overflow-x-hidden px-3 py-3 sm:px-4">

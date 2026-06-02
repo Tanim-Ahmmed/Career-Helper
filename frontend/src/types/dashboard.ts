@@ -16,6 +16,52 @@ export interface UserDashboardResponse {
   recommendedJobs: Job[];
 }
 
+export interface RecruiterDashboardResponse {
+  stats: {
+    totalJobs: number;
+    activeJobs: number;
+    draftJobs: number;
+    closedJobs: number;
+
+    totalApplications: number;
+
+    pendingApplications: number;
+    reviewedApplications: number;
+    shortlistedApplications: number;
+    rejectedApplications: number;
+
+    scheduledInterviews: number;
+
+    totalViews: number;
+  };
+
+  recentApplications: Array<{
+    id: string;
+    applicantName: string;
+    applicantEmail: string;
+    jobTitle: string;
+    status: string;
+    appliedAt: Date;
+  }>;
+
+  topJobs: Array<{
+    id: string;
+    title: string;
+    applications: number;
+    views: number;
+  }>;
+
+  applicationTimeline: Array<{
+    month: string;
+    applications: number;
+  }>;
+
+  profileCompletion: {
+    completed: boolean;
+    percentage: number;
+  };
+}
+
 export interface AdminDashboardResponse {
   stats: {
     totalUsers: number;

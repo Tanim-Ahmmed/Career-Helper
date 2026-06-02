@@ -36,6 +36,11 @@ const salarySchema = new Schema(
 
 const jobsSchema = new Schema<IJob>(
   {
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     title: {
       type: String,
       required: true,

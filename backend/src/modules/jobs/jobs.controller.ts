@@ -6,7 +6,7 @@ import type { JobsQuery } from "./jobs.interface";
 import { jobsService } from "./jobs.service";
 
 const createJob = catchAsync(async (req: Request, res: Response) => {
-  const result = await jobsService.createJob(req.body);
+  const result = await jobsService.createJob({ ...req.body, createdBy: req.user?._id });
 
   sendResponse(res, 201, {
     success: true,
@@ -16,13 +16,19 @@ const createJob = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllJobs = catchAsync(async (req: Request, res: Response) => {
-  const validatedQuery = (res.locals.validated?.query ?? req.query) as JobsQuery & {
-    includeDrafts?: boolean;
-  };
-  const includeDrafts =
-    req.user?.role === "admin" && validatedQuery.includeDrafts === true;
+  const validatedQuery = (res.locals.validated?.query ??
+    req.query) as JobsQuery & {
+      includeDrafts?: boolean;
+    };
 
-  const result = await jobsService.getAllJobs(validatedQuery, includeDrafts);
+  const includeDrafts = ["admin", "recruiter"].includes(req.user?.role || '') && validatedQuery.includeDrafts === true;
+
+  const result = await jobsService.getAllJobs(
+    validatedQuery,
+    req.user?.role,
+    req.user?._id?.toString(),
+    includeDrafts,
+  );
 
   sendResponse(res, 200, {
     success: true,

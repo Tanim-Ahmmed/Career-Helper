@@ -129,6 +129,81 @@ async function getUserDashboard(user: IUserDocument) {
   };
 }
 
+async function getRecruiterDashboard(recruiterId: string) {
+  const jobs = await jobsModel.find({ recruiterId });
+
+  const jobIds = jobs.map((job) => job._id);
+
+  const applications = await applicationsModel.find({
+    jobId: { $in: jobIds },
+  });
+
+  const [recentApplications, topJobs] = await Promise.all([
+    applicationsModel
+      .find({ jobId: { $in: jobIds } })
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .populate("jobId", "title")
+      .populate("userId", "name email"),
+
+    jobsModel
+      .find({ recruiterId })
+      .sort({ views: -1 })
+      .limit(5),
+  ]);
+
+  return {
+    stats: {
+      totalJobs: jobs.length,
+
+      activeJobs: jobs.filter((j) => j.status === "published").length,
+      draftJobs: jobs.filter((j) => j.status === "draft").length,
+      closedJobs: jobs.filter((j) => j.status === "closed").length,
+
+      totalApplications: applications.length,
+
+      pendingApplications: applications.filter(
+        (a) => a.applicationStatus === "pending",
+      ).length,
+
+      reviewedApplications: applications.filter(
+        (a) => a.applicationStatus === "reviewed",
+      ).length,
+
+      shortlistedApplications: applications.filter(
+        (a) => a.applicationStatus === "shortlisted",
+      ).length,
+
+      rejectedApplications: applications.filter(
+        (a) => a.applicationStatus === "rejected",
+      ).length,
+
+      scheduledInterviews: applications.filter(
+        (a) => a.interviewDate,
+      ).length,
+
+      totalViews: jobs.reduce((sum, job) => sum + (job.views || 0), 0),
+    },
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recentApplications: recentApplications.map((app:any) => ({
+      id: app._id,
+      applicantName: app.userId?.name,
+      applicantEmail: app.userId?.email,
+      jobTitle: app.jobId?.title,
+      status: app.applicationStatus,
+      appliedAt: app.createdAt,
+    })),
+
+    topJobs: topJobs.map((job) => ({
+      id: job._id,
+      title: job.title,
+      applications: 0, // optional optimize later
+      views: job.views || 0,
+    })),
+  };
+}
+
 async function getAdminDashboard() {
   const [totalUsers, totalAdmins, totalJobs, publishedJobs, totalApplications, totalBlogs, recentUsers] =
     await Promise.all([
@@ -233,6 +308,7 @@ export const usersService = {
   },
   updateProfile,
   getUserDashboard,
+  getRecruiterDashboard,
   getAdminDashboard,
   getAdminUsers,
   saveJob,

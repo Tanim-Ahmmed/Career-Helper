@@ -1,4 +1,4 @@
-import type { HydratedDocument } from "mongoose";
+import type { HydratedDocument, ObjectId } from "mongoose";
 
 export type JobStatus = "draft" | "published" | "closed";
 export type EmploymentType =
@@ -17,6 +17,7 @@ export interface JobSalary {
 }
 
 export interface IJob {
+  createdBy:ObjectId;
   title: string;
   slug: string;
   company: string;

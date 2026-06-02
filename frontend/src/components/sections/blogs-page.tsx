@@ -142,7 +142,7 @@ export function BlogsPage() {
         badge="Keep Moving"
         title="Turn what you read into better applications."
         description="Use the blog for guidance, then move into jobs discovery and the AI workflow when you’re ready to act on what you learned."
-        primaryAction={{ href: "/dashboard/cover-letters", label: "Open Cover Letter Tool" }}
+        primaryAction={{ href: "/user/cover-letters", label: "Open Cover Letter Tool" }}
         secondaryAction={{ href: "/jobs", label: "Find Roles" }}
       />
     </main>

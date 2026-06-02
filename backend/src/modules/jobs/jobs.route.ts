@@ -18,23 +18,23 @@ jobsRoutes.get("/featured", jobsController.getFeaturedJobs);
 jobsRoutes.post(
   "/",
   protect,
-  restrictTo("admin"),
+  restrictTo("admin","recruiter"),
   validateRequest(createJobSchema),
   jobsController.createJob,
 );
 
-jobsRoutes.get("/admin/:id", protect, restrictTo("admin"), jobsController.getJobById);
+jobsRoutes.get("/admin/:id", protect, restrictTo("admin", "recruiter"), jobsController.getJobById);
 jobsRoutes.patch(
   "/admin/:id",
   protect,
-  restrictTo("admin"),
+  restrictTo("admin", "recruiter"),
   validateRequest(updateJobSchema),
   jobsController.updateJob,
 );
 jobsRoutes.delete(
   "/admin/:id",
   protect,
-  restrictTo("admin"),
+  restrictTo("admin", "recruiter"),
   jobsController.deleteJob,
 );
 

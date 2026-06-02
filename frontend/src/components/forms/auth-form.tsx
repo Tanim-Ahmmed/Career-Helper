@@ -94,11 +94,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       toast.success("Google login successful!");
 
       // Navigate based on user role
-      const redirectPath =
-        response.user.role === "admin"
-          ? "/admin"
-          : "/dashboard";
-
+      const redirectPath = response.user.role === "admin" ? "/admin" : response.user.role === "user" ? '/user' : "/recruiter";
       router.push(redirectPath);
     } catch (error) {
       console.error("Google login error:", error);
@@ -151,10 +147,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       );
 
       // Navigate based on user role
-      const redirectPath =
-        response.user.role === "admin"
-          ? "/admin"
-          : "/dashboard";
+      const redirectPath = response.user.role === "admin" ? "/admin" : response.user.role === "user" ? '/user' : "/recruiter";
 
       router.push(redirectPath);
       router.refresh();

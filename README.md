@@ -115,7 +115,7 @@ After seeding:
 3. Sign in with `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
 4. Admin users are redirected to `/admin`.
 
-Regular users continue to land on `/dashboard`.
+Regular users continue to land on `/user`.
 
 ## Auth And Toast Behavior
 

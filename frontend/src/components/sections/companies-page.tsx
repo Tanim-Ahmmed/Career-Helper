@@ -231,7 +231,7 @@ export function CompaniesPage() {
         title="Shortlist better employers before you spend time applying."
         description="Use the company directory to narrow the field, then jump into the jobs explorer and AI tools once you find a team worth pursuing."
         primaryAction={{ href: "/jobs", label: "Browse All Jobs" }}
-        secondaryAction={{ href: "/dashboard/resume-analyzer", label: "Open AI Tools" }}
+        secondaryAction={{ href: "/user/resume-analyzer", label: "Open AI Tools" }}
       />
     </main>
   );

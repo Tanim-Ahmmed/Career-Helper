@@ -150,7 +150,6 @@ function getCurrentUser(user: SafeUserDocument) {
 }
 
 async function updateCurrentUser(user: SafeUserDocument, payload: SafeUserDocument) {
-  console.log(user, payload);
   return await usersModel.findByIdAndUpdate(
     user._id,
     { $set: payload },

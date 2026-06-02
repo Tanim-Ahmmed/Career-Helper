@@ -83,13 +83,37 @@ async function createJob(payload: CreateJobPayload) {
   return createdJob;
 }
 
-async function getAllJobs(query: JobsQuery, includeDrafts = false) {
+async function getAllJobs(
+  query: JobsQuery,
+  role?: "admin" | "user" | "recruiter",
+  userId?: string,
+  includeDrafts = false,
+) {
   const page = query.page ?? 1;
   const limit = query.limit ?? 12;
   const skip = (page - 1) * limit;
+
   const sortBy = query.sortBy ?? "createdAt";
   const sortOrder = query.sortOrder === "asc" ? 1 : -1;
+
   const filter = buildJobsFilter(query, includeDrafts);
+
+  // Recruiter -> own jobs only
+  if (role === "recruiter") {
+    filter.createdBy = userId;
+  }
+
+  // Admin can see all jobs
+  else if (role === "admin") {
+    if (!includeDrafts) {
+      filter.status = "published";
+    }
+  }
+
+  // User or guest
+  else {
+    filter.status = "published";
+  }
 
   const [jobs, total] = await Promise.all([
     jobsModel
@@ -97,6 +121,7 @@ async function getAllJobs(query: JobsQuery, includeDrafts = false) {
       .sort({ [sortBy]: sortOrder })
       .skip(skip)
       .limit(limit),
+
     jobsModel.countDocuments(filter),
   ]);
 

@@ -42,7 +42,7 @@ export default function UserDashboardOverviewPage() {
         description="Track saved jobs, application progress, profile completion, and the Gemini-powered tools that strengthen each stage of your search."
         action={
           <Link
-            href="/dashboard/profile-settings"
+            href="/user/profile-settings"
             className="inline-flex items-center gap-2 text-sm font-semibold text-primary"
           >
             Refine profile

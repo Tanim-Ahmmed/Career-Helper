@@ -18,7 +18,8 @@ export const publicNavItems: NavigationItem[] = [
 
 export const loggedInNavItems: NavigationItem[] = [
   ...corePublicNavItems,
-  { label: "Dashboard", href: "/dashboard" },
+  { label: "User", href: "/user" },
+  { label: "Recruiter", href: "/recruiter" },
 ];
 
 export const resourceMenuItems: NavigationItem[] = [
