@@ -10,6 +10,8 @@ export type AiHistoryStatus = "success" | "error";
 
 export interface IAiHistory {
   userId: Types.ObjectId;
+  role:string,
+  inputType:string;
   feature: AiFeature;
   model: string;
   prompt: string;
@@ -17,6 +19,10 @@ export interface IAiHistory {
   status: AiHistoryStatus;
   errorMessage?: string;
   metadata?: Record<string, string | number | boolean | null>;
+  jobId?:Types.ObjectId;
+  applicationId?:Types.ObjectId;
+  tokensUsed: number;
+  cost:number;
   createdAt?: Date;
   updatedAt?: Date;
 }

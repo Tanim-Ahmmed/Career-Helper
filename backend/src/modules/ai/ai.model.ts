@@ -9,6 +9,18 @@ const aiHistorySchema = new Schema<IAiHistory>(
       ref: "User",
       required: true,
     },
+    role: {
+      type: String,
+      enum: ["user", "recruiter", "admin"],
+      required: true,
+    },
+
+    inputType: {
+      type: String,
+      enum: ["text", "resume", "job", "application"],
+      default: "text",
+    },
+
     feature: {
       type: String,
       enum: [
@@ -16,6 +28,10 @@ const aiHistorySchema = new Schema<IAiHistory>(
         "resume-analyzer",
         "cover-letter-generator",
         "interview-assistant",
+        "job-generator",
+        "candidate-screening",
+        "job-match",
+        "career-coach",
       ],
       required: true,
     },
@@ -48,6 +64,25 @@ const aiHistorySchema = new Schema<IAiHistory>(
       type: Schema.Types.Mixed,
       default: {},
     },
+
+    jobId: {
+      type: Schema.Types.ObjectId,
+      ref: "Job",
+      default: null,
+    },
+    applicationId: {
+      type: Schema.Types.ObjectId,
+      ref: "Application",
+      default: null,
+    },
+    tokensUsed: {
+      type: Number,
+      default: 0,
+    },
+    cost: {
+      type: Number,
+      default: 0,
+    }
   },
   {
     timestamps: true,
