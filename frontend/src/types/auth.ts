@@ -6,8 +6,9 @@ export interface AuthUser {
   username: string;
   email: string;
   avatar?: string;
-
   userProfile: {
+    resumeFile: string;
+    resumeText: string;
     bio?: string;
     profession?: string;
     skills?: string[];
@@ -23,7 +24,22 @@ export interface AuthUser {
       website?: string;
     };
   }
-  recruiterProfile: any;
+  recruiterProfile:{
+    companyName: string;
+    companyLogo: string;
+    companyWebsite: string;
+    companyLocation: string;
+  
+    companySize: string;
+    industry: string;
+    designation: string;
+    companyDescription: string;
+    foundedYear: string;
+    phone: string;
+    isVerified: boolean;
+    hiringStatus:string;
+    isComplete: boolean;
+  };
   role: UserRole;
   aiUsageCount: number;
   createdAt?: string;

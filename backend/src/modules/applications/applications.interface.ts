@@ -11,10 +11,12 @@ export type ApplicationStatus =
 export interface IApplication {
   userId: Types.ObjectId;
   jobId: Types.ObjectId;
+  resumeText: string;
   resumeUrl: string;
   coverLetter: string;
   applicationStatus: ApplicationStatus;
   interviewDate?: Date | null;
+  score?: number;
   feedback?: string;
 }
 
@@ -28,6 +30,7 @@ export interface ApplicationsQuery {
 export interface CreateApplicationPayload {
   jobId: string;
   resumeUrl?: string;
+  resumeText?: string;
   coverLetter?: string;
 }
 

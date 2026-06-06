@@ -2,8 +2,7 @@ import axios from "axios";
 
 import { getStoredAuthToken } from "@/store/auth-store";
 
-const baseURL =
-  process.env.NEXT_PUBLIC_API_URL?.trim();
+const baseURL = process.env.NEXT_PUBLIC_API_URL?.trim();
 
 export const api = axios.create({
   baseURL,

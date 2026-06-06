@@ -38,6 +38,8 @@ export interface AuthResponseUser {
   aiUsageCount: number;
   savedJobs?: string[];
   appliedJobs?: string[];
+  userProfile?:object;
+  recruiterProfile?:object;
 }
 
 export interface AuthResponse {

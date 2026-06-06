@@ -18,12 +18,20 @@ export async function fetchUserDashboard() {
   return data.data;
 }
 
-export async function updateProfile(payload: Partial<AuthUser>) {
+export async function updateProfile(payload: Partial<AuthUser> | FormData) {
+  // 🎯 ১. চেক করা—পেলোডটি কি FormData (ফাইলসহ) নাকি নরমাল অবজেক্ট
+  const isFormData = payload instanceof FormData;
+
   const { data } = await api.patch<{
     success: boolean;
     message: string;
     data: AuthUser;
-  }>("/auth/me", payload);
+  }>("/auth/me", payload, {
+    // 🎯 ২. ডাইনামিক হেডার সেট করা
+    headers: {
+      "Content-Type": isFormData ? "multipart/form-data" : "application/json",
+    },
+  });
 
   return data.data;
 }
@@ -34,6 +42,16 @@ export async function fetchMyApplications() {
     message: string;
     data: Application[];
   }>("/applications/me");
+
+  return data.data;
+}
+
+export async function fetchApplications() {
+  const { data } = await api.get<{
+    success: boolean;
+    message: string;
+    data: Application[];
+  }>("/applications");
 
   return data.data;
 }

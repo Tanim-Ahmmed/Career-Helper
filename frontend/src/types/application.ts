@@ -46,6 +46,7 @@ export interface PaginatedApplicationsResponse {
 export interface CreateApplicationPayload {
   jobId: string;
   resumeUrl?: string;
+  resumeText?:string;
   coverLetter?: string;
 }
 

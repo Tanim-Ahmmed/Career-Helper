@@ -12,6 +12,15 @@ const getStatus = catchAsync(async (_req: Request, res: Response) => {
   });
 });
 
+const getApplications = catchAsync(async (req: Request, res: Response) => {
+  const applications = await applicationService.getApplications(req.user!._id.toString());
+  sendResponse(res, 200, {
+    success: true,
+    message: "Applications retrieved successfully.",
+    data: applications,
+  });
+});
+
 const getMyApplications = catchAsync(async (req: Request, res: Response) => {
   const applications = await applicationService.getUserApplications(req.user!._id.toString());
 
@@ -58,6 +67,7 @@ const updateAdminApplication = catchAsync(async (req: Request, res: Response) =>
 export const applicationsController = {
   getStatus,
   createApplication,
+  getApplications,
   getMyApplications,
   getAdminApplications,
   updateAdminApplication,

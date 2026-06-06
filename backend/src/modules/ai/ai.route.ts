@@ -1,36 +1,32 @@
 import { Router } from "express";
 
-import { protect } from "../../middleware/auth";
-import { validateRequest } from "../../middleware/validate-request";
+import { protect, restrictTo } from "../../middleware/auth";
+// import { validateRequest } from "../../middleware/validate-request";
 import { aiController } from "./ai.controller";
-import {
-  aiHistoryQuerySchema,
-  coverLetterGeneratorSchema,
-  generateAiContentSchema,
-  interviewAssistantSchema,
-  resumeAnalyzerSchema,
-} from "./ai.validation";
+// import {
+//   aiHistoryQuerySchema,
+//   coverLetterGeneratorSchema,
+//   generateAiContentSchema,
+//   interviewAssistantSchema,
+//   resumeAnalyzerSchema,
+// } from "./ai.validation";
 
 export const aiRoutes = Router();
 
-aiRoutes.get("/status", aiController.getStatus);
-aiRoutes.post("/generate", protect, validateRequest(generateAiContentSchema), aiController.generateContent);
-aiRoutes.get("/history", protect, validateRequest(aiHistoryQuerySchema), aiController.getMyHistory);
-aiRoutes.post(
-  "/resume-analyzer",
-  protect,
-  validateRequest(resumeAnalyzerSchema),
-  aiController.analyzeResume,
-);
-aiRoutes.post(
-  "/cover-letter-generator",
-  protect,
-  validateRequest(coverLetterGeneratorSchema),
-  aiController.generateCoverLetter,
-);
-aiRoutes.post(
-  "/interview-assistant",
-  protect,
-  validateRequest(interviewAssistantSchema),
-  aiController.generateInterviewAssistant,
-);
+/* -------------------- JOB GENERATOR -------------------- */
+aiRoutes.post("/job-generator", protect, restrictTo("recruiter", "admin"), aiController.generateJob,);
+
+/* -------------------- JOB MATCH -------------------- */
+aiRoutes.post("/job-match", protect, restrictTo("user", "recruiter", "admin"), aiController.jobMatch,);
+
+/* -------------------- COVER LETTER -------------------- */
+aiRoutes.post("/generate-cover-letter", protect, restrictTo("user", "recruiter", "admin"), aiController.generateCoverLetter,);
+
+/* -------------------- RESUME ANALYZER -------------------- */
+aiRoutes.post("/resume-analyzer", protect, restrictTo("user", "recruiter", "admin"), aiController.analyzeResume,);
+
+/* -------------------- INTERVIEW ASSISTANT -------------------- */
+aiRoutes.post("/interview-assistant", protect, restrictTo("user", "recruiter", "admin"), aiController.interviewAssistant,);
+
+/* -------------------- AI HISTORY -------------------- */
+aiRoutes.get("/history", protect, aiController.getAiHistory,);

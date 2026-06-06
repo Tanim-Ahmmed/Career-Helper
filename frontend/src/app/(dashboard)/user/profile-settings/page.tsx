@@ -14,7 +14,7 @@ import { SectionBadge } from "@/components/shared/section-badge";
 import { fetchUserDashboard, updateProfile } from "@/services/dashboard";
 import { useAuthStore } from "@/store/auth-store";
 
-type ProfileFormValues = {
+export type ProfileFormValues = {
   name: string;
   username: string;
   avatar: string;
@@ -25,6 +25,7 @@ type ProfileFormValues = {
     bio: string;
     skills: string;
     resumeUrl: string;
+    resumeFile: string;
 
     socialLinks: {
       linkedin: string;
@@ -45,23 +46,13 @@ type ProfileFormValues = {
 
     companyDescription: string;
 
-    companySize:
-    | "1-10"
-    | "11-50"
-    | "51-200"
-    | "201-500"
-    | "500+"
-    | "";
+    companySize: "" | "1-10" | "11-50" | "51-200" | "201-500" | "500+" | undefined;
 
     foundedYear: string;
 
     phone: string;
 
-    hiringStatus:
-    | "actively_hiring"
-    | "occasionally_hiring"
-    | "not_hiring"
-    | "";
+    hiringStatus: "" | "actively_hiring" | "occasionally_hiring" | "not_hiring" | undefined;
   };
 };
 
@@ -89,6 +80,7 @@ export default function ProfileSettingsPage() {
         experienceLevel: "",
         bio: "",
         resumeUrl: "",
+        resumeFile: "",
         skills: "",
 
         socialLinks: {
@@ -130,6 +122,7 @@ export default function ProfileSettingsPage() {
         experienceLevel: profile.userProfile?.experienceLevel ?? "",
         bio: profile.userProfile?.bio ?? "",
         resumeUrl: profile.userProfile?.resumeUrl ?? "",
+        resumeFile: profile.userProfile?.resumeFile ?? "",
         skills: profile.userProfile?.skills?.join(", ") ?? "",
         socialLinks: {
           linkedin: profile.userProfile?.socialLinks?.linkedin ?? "",
@@ -159,7 +152,7 @@ export default function ProfileSettingsPage() {
     return <DashboardFormLoadingShell />;
   }
 
-  const onSubmit = form.handleSubmit(async (values) => {
+  const onSubmit = form.handleSubmit(async (values: any) => {
     try {
       const payload: any = {
         name: values.name,
@@ -168,30 +161,56 @@ export default function ProfileSettingsPage() {
       };
 
       if (role === "user") {
+        // 🎯 ফিক্স ১: skills যদি স্ট্রিং না হয় তবে সেটিকে সেইফলি হ্যান্ডেল করা (ক্র্যাশ প্রোটেকশন)
+        const rawSkills = values.userProfile?.skills;
+        const parsedSkills = typeof rawSkills === "string"
+          ? rawSkills.split(",").map((skill: string) => skill.trim()).filter(Boolean)
+          : Array.isArray(rawSkills) ? rawSkills : [];
+
         payload.userProfile = {
           ...values.userProfile,
-
-          skills:
-            values.userProfile?.skills
-              .split(",")
-              .map((skill) => skill.trim())
-              .filter(Boolean) ?? [],
+          skills: parsedSkills,
         };
+
+        // 🎯 ফিক্স ২: পেলোড ক্লিন রাখা (পেলোডের ভেতর থেকে ফ্রন্টএন্ডের ফাইল অবজেক্ট মুছে দেওয়া)
+        if (payload.userProfile.resumeFile) {
+          delete payload.userProfile.resumeFile;
+        }
       }
 
       if (role === "recruiter") {
         payload.recruiterProfile = {
           ...values.recruiterProfile,
-
           foundedYear: values.recruiterProfile?.foundedYear
             ? Number(values.recruiterProfile.foundedYear)
             : undefined,
         };
       }
 
-      const updatedProfile = await updateProfile(payload);
+      // ফাইল ইনপুট থেকে পিডিএফ ফাইলটি চেক করা
+      const fileList = values.userProfile?.resumeFile;
+      let updatedProfile;
 
-      updateUser(updatedProfile);
+      // যদি ইউজার পার্স করার জন্য নতুন কোনো PDF ফাইল সিলেক্ট করে
+      if (role === "user" && fileList && fileList.length > 0) {
+        const formData = new FormData();
+
+        // JSON পেলোডটিকে স্ট্রিং বানিয়ে FormData-তে যুক্ত করা হলো
+        formData.append("profileData", JSON.stringify(payload));
+
+        // শুধুমাত্র পার্স করার জন্য ফাইলটি পাঠানো হচ্ছে 🎯
+        formData.append("resumeFile", fileList[0]);
+
+        updatedProfile = await updateProfile(formData as any);
+      } else {
+        // যদি ইউজার নতুন কোনো ফাইল না দেয়, তবে নরমাল JSON যাবে
+        updatedProfile = await updateProfile(payload);
+      }
+
+      // স্টেট ও ড্যাশবোর্ড রিফ্রেশ করা
+      if (updatedProfile) {
+        updateUser(updatedProfile);
+      }
 
       await queryClient.invalidateQueries({
         queryKey: ["user-dashboard"],
@@ -283,14 +302,30 @@ export default function ProfileSettingsPage() {
                 />
               </Field>
 
-              <Field label="Resume URL">
-                <input
-                  className={inputClassName}
-                  {...form.register(
-                    "userProfile.resumeUrl"
-                  )}
-                />
-              </Field>
+
+              <div className="grid gap-4 md:grid-cols-2 text-gray-900 dark:text-gray-100">
+
+                {/* ১. রেজুমি ইউআরএল ইনপুট ফিল্ড */}
+                <Field label="Resume URL">
+                  <input
+                    type="url"
+                    placeholder="https://example.com/my-resume.pdf"
+                    className={`${inputClassName} bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 transition-colors`}
+                    {...form.register("userProfile.resumeUrl")}
+                  />
+                </Field>
+
+                {/* ২. রেজুমি পিডিএফ ফাইল আপলোড ফিল্ড */}
+                <Field label="Upload Resume (PDF)">
+                  <input
+                    type="file"
+                    accept=".pdf" // 🎯 শুধুমাত্র PDF ফাইল সিলেক্ট করতে দেওয়ার জন্য
+                    className={`${inputClassName} bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-gray-800 dark:file:text-indigo-400 hover:file:bg-indigo-100 dark:hover:file:bg-gray-700 cursor-pointer transition-colors`}
+                    {...form.register("userProfile.resumeFile")}
+                  />
+                </Field>
+
+              </div>
 
               <div className="grid gap-4 md:grid-cols-2">
                 <Field label="LinkedIn">

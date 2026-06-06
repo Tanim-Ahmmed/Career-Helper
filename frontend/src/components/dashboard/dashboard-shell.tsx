@@ -48,17 +48,15 @@ import { useAuthStore } from "@/store/auth-store";
 const userNavigation = [
   { href: "/user", label: "Overview", icon: Home },
   { href: "/user/profile-settings", label: "Profile Settings", icon: UserCircle2 },
-
   { href: "/user/saved-jobs", label: "Saved Jobs", icon: Bookmark },
   { href: "/user/applications", label: "My Applications", icon: FileText },
-
   { href: "/user/resume-builder", label: "Resume Builder", icon: FilePlus2 },
   { href: "/user/cover-letters", label: "Cover Letters", icon: FileText },
-  
   { href: "/user/interview-assistant", label: "Interview Assistant", icon: MessageSquareQuote },
-  { href: "/user/job-alerts", label: "Job Alerts", icon: Bell },
-  
-  { href: "/user/notifications", label: "Notifications", icon: BellRing },
+
+  // { href: "/user/job-alerts", label: "Job Alerts", icon: Bell },
+  // { href: "/user/notifications", label: "Notifications", icon: BellRing },
+
   { href: "/user/ai-history", label: "AI History", icon: BarChart3 },
 ];
 
@@ -69,39 +67,30 @@ const recruiterNavigation = [
   { href: "/recruiter/applications", label: "Applications", icon: FileText },
   
   // { href: "/recruiter/candidates", label: "Candidates", icon: Users },
-  { href: "/recruiter/resume-analyzer", label: "Resume Analyzer", icon: FileSearch },
+  // { href: "/recruiter/resume-analyzer", label: "Resume Analyzer", icon: FileSearch },
+  // { href: "/recruiter/shortlisted", label: "Shortlisted", icon: Star },
+  // { href: "/recruiter/interviews", label: "Interviews", icon: CalendarDays },
+  // { href: "/recruiter/analytics", label: "Analytics", icon: BarChart3 },
+  // { href: "/recruiter/subscription", label: "Subscription", icon: CreditCard },
+  // { href: "/recruiter/settings", label: "Settings", icon: Settings },
 
-  { href: "/recruiter/shortlisted", label: "Shortlisted", icon: Star },
-
-  { href: "/recruiter/interviews", label: "Interviews", icon: CalendarDays },
-
-  { href: "/recruiter/analytics", label: "Analytics", icon: BarChart3 },
-
-  { href: "/recruiter/subscription", label: "Subscription", icon: CreditCard },
-
-  { href: "/recruiter/settings", label: "Settings", icon: Settings },
+  { href: "/user/ai-history", label: "AI History", icon: BarChart3 },
 ];
 
 const adminNavigation = [
   { href: "/admin", label: "Analytics", icon: ShieldCheck },
-
-  { href: "/admin/users", label: "Users", icon: Users2 },
-  { href: "/admin/recruiters", label: "Recruiters", icon: Building2 },
-
+  { href: "/admin/users", label: "All Users", icon: Users2 },
   { href: "/admin/jobs", label: "Jobs", icon: BriefcaseBusiness },
   { href: "/admin/applications", label: "Applications", icon: FileText },
-
   { href: "/admin/blogs", label: "Blogs", icon: BookOpenText },
 
-  { href: "/admin/categories", label: "Categories", icon: FolderTree },
-
-  { href: "/admin/skills", label: "Skills", icon: BadgeCheck },
+  // { href: "/admin/categories", label: "Categories", icon: FolderTree },
+  // { href: "/admin/skills", label: "Skills", icon: BadgeCheck },
+  // { href: "/admin/payments", label: "Payments", icon: CreditCard },
 
   { href: "/admin/reports", label: "Reports", icon: BarChart3 },
-
-  { href: "/admin/payments", label: "Payments", icon: CreditCard },
-
   { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/user/ai-history", label: "AI History", icon: BarChart3 },
 ];
 
 const publicQuickLinks = [

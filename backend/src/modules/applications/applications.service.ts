@@ -1,4 +1,4 @@
-import { Types, type FilterQuery } from "mongoose";
+import mongoose, { Types, type FilterQuery } from "mongoose";
 
 import { jobsModel } from "../jobs/jobs.model";
 import { usersModel } from "../users/users.model";
@@ -19,6 +19,69 @@ function buildApplicationsFilter(query: ApplicationsQuery): FilterQuery<IApplica
   }
 
   return filter;
+}
+
+async function getApplications(userId: string) {
+  return applicationsModel.aggregate([
+    // ১. প্রথমে Jobs কালেকশনের সাথে জয়েন (Lookup) করা
+    {
+      $lookup: {
+        from: "jobs", // আপনার ডাটাবেজে jobs কালেকশনের আসল নাম (সাধারণত plural হয়)
+        localField: "jobId",
+        foreignField: "_id",
+        as: "jobDetails",
+      },
+    },
+    // ২. জবের ডেটা অ্যারে থেকে অবজেক্টে রূপান্তর করা
+    { $unwind: "$jobDetails" },
+    // ৩. ফিল্টার করা: শুধুমাত্র এই ইউজারের তৈরি করা জবের অ্যাপ্লিকেশনগুলো নেওয়া
+    {
+      $match: {
+        "jobDetails.createdBy": new mongoose.Types.ObjectId(userId),
+      },
+    },
+    // ৪. ইউজারের প্রোফাইল জয়েন করা (আবেদনকারীর নাম/ইমেইল দেখার জন্য)
+    {
+      $lookup: {
+        from: "users", // ইউজার কালেকশনের নাম
+        localField: "userId",
+        foreignField: "_id",
+        as: "applicantDetails",
+      },
+    },
+    { $unwind: { path: "$applicantDetails", preserveNullAndEmptyArrays: true } },
+    // ৫. প্রজেকশন: ফ্রন্টএন্ডে যে যে ফিল্ড দেখাতে চান তা সাজানো
+    {
+      $project: {
+        _id: 1,
+        resumeUrl:1,
+        coverLetter: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        applicationStatus: 1,
+        interviewDate:1,
+        job: {
+          _id: "$jobDetails._id",
+          title: "$jobDetails.title",
+          slug: "$jobDetails.slug",
+          company: "$jobDetails.company",
+          location: "$jobDetails.location",
+          workplaceType: "$jobDetails.workplaceType",
+          employmentType: "$jobDetails.employmentType",
+          status: "$jobDetails.status"
+        },
+        applicant: {
+          _id: "$applicantDetails._id",
+          name: "$applicantDetails.name",
+          email: "$applicantDetails.email",
+          profession: "$applicantDetails.userProfile.profession",
+          skills: "$applicantDetails.userProfile.skills"
+        }
+      },
+    },
+    // ৬. লেটেস্ট অ্যাপ্লিকেশনগুলো আগে দেখানোর জন্য সর্ট করা
+    { $sort: { updatedAt: -1 } },
+  ]);
 }
 
 async function getUserApplications(userId: string) {
@@ -164,6 +227,7 @@ export const applicationService = {
     };
   },
   createApplication,
+  getApplications,
   getUserApplications,
   getAdminApplications,
   updateApplicationByAdmin,

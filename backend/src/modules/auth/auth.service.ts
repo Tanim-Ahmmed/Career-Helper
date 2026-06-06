@@ -24,6 +24,8 @@ function serializeUser(user: SafeUserDocument) {
     aiUsageCount: user.aiUsageCount,
     savedJobs: user.userProfile?.savedJobs.map((jobId) => jobId.toString()),
     appliedJobs: user.userProfile?.appliedJobs.map((jobId) => jobId.toString()),
+    userProfile:user.userProfile,
+    recruiterProfile:user.recruiterProfile,
   };
 }
 

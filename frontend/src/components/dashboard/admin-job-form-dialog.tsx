@@ -84,17 +84,21 @@ export function AdminJobFormDialog({
   const handleGenerateJob = async () => {
     const title = form.getValues("title");
     const employmentType = form.getValues("employmentType");
-    const workplaceType = form.getValues("workplaceType");
-    const salary = form.getValues("salary");
-
-
+    const workplaceType = form.getValues("workplaceType");  
+    
     if (!title) {
       toast.error("Please enter job title first");
       return;
     }
 
+    form.setValue("company", currentUser?.recruiterProfile.companyName || '');
+    form.setValue("companyLogo", currentUser?.recruiterProfile.companyLogo || '');
+    form.setValue("companyWebsite", currentUser?.recruiterProfile.companyWebsite || '');
+    form.setValue("location", currentUser?.recruiterProfile.companyLocation || '');
+
     try {
-      const { data } = await api.post("/ai/job-generator", { title, employmentType, workplaceType, salary });
+      const { data } = await api.post("/ai/job-generator", { title, employmentType, workplaceType });
+      console.log(data);
 
       const job = data.data;
 

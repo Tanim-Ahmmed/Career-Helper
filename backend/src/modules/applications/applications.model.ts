@@ -14,6 +14,11 @@ const applicationsSchema = new Schema<IApplication>(
       ref: "Job",
       required: true,
     },
+    resumeText: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     resumeUrl: {
       type: String,
       trim: true,
@@ -32,6 +37,10 @@ const applicationsSchema = new Schema<IApplication>(
     interviewDate: {
       type: Date,
       default: null,
+    },
+    score: {
+      type: Number,
+      default: 0,
     },
     feedback: {
       type: String,

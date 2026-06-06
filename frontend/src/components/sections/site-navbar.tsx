@@ -35,13 +35,6 @@ import { useAuthStore } from "@/store/auth-store";
 
 type DropdownKey = "resources" | "profile" | null;
 
-const accountMenuItems = [
-  { label: "Dashboard", href: "/user", icon: LayoutDashboard },
-  { label: "Applications", href: "/user/applications", icon: BriefcaseBusiness },
-  { label: "Resume Analyzer", href: "/user/resume-analyzer", icon: FileSearch },
-  { label: "Cover Letters", href: "/user/cover-letters", icon: FileText },
-  { label: "Interview Assistant", href: "/user/interview-assistant", icon: MessageSquareQuote },
-];
 
 export function SiteNavbar() {
   const pathname = usePathname();
@@ -53,6 +46,7 @@ export function SiteNavbar() {
   const [openDropdown, setOpenDropdown] = useState<DropdownKey>(null);
 
   const user = useAuthStore((state) => state.user);
+  const accountMenuItems = [{ label: "Dashboard", href: `/${user!.role}`, icon: LayoutDashboard }];
   const clearSession = useAuthStore((state) => state.clearSession);
   const isAuthenticated = Boolean(user);
   const navItems = isAuthenticated ? loggedInNavItems : publicNavItems;

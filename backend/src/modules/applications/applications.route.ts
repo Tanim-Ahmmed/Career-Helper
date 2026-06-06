@@ -12,25 +12,8 @@ import {
 export const applicationRoutes = Router();
 
 applicationRoutes.get("/status", applicationsController.getStatus);
-applicationRoutes.post(
-  "/",
-  protect,
-  restrictTo("user"),
-  validateRequest(createApplicationSchema),
-  applicationsController.createApplication,
-);
+applicationRoutes.post("/", protect, restrictTo("user"), validateRequest(createApplicationSchema), applicationsController.createApplication,);
+applicationRoutes.get("/", protect,restrictTo("admin", "recruiter"), applicationsController.getApplications);
 applicationRoutes.get("/me", protect, applicationsController.getMyApplications);
-applicationRoutes.get(
-  "/admin",
-  protect,
-  restrictTo("admin"),
-  validateRequest(applicationsQuerySchema),
-  applicationsController.getAdminApplications,
-);
-applicationRoutes.patch(
-  "/admin/:id",
-  protect,
-  restrictTo("admin"),
-  validateRequest(updateApplicationSchema),
-  applicationsController.updateAdminApplication,
-);
+applicationRoutes.get("/admin", protect, restrictTo("admin"), validateRequest(applicationsQuerySchema), applicationsController.getAdminApplications,);
+applicationRoutes.patch("/admin/:id", protect, restrictTo("admin"), validateRequest(updateApplicationSchema), applicationsController.updateAdminApplication,);
